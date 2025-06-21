@@ -1,6 +1,6 @@
 {
   "name": "connect-4",
-  "homepage": "https://connect-4.ryan-brock.com"
+  "homepage": "https://connect-4.ryan-brock.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "gh-pages": "gh-pages -d dist/connect-4/browser",
+    "gh-pages": "gh-pages -d dist",
     "deploy": "ng build --base-href=https://connect-4.ryan-brock.com",
     "prod": "npm run deploy && npm run gh-pages"
   },
