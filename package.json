@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "gh-pages": "gh-pages -d dist",
-    "deploy": "ng build --base-href=https://connect-4.ryan-brock.com",
+    "deploy": "npm run build --base-href=https://connect-4.ryan-brock.com",
     "prod": "npm run deploy && npm run gh-pages"
   },
   "dependencies": {
