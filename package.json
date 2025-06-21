@@ -1,5 +1,6 @@
 {
   "name": "connect-4",
+  "homepage": "https://connect-4.ryan-brock.com"
   "private": true,
   "version": "0.0.0",
   "type": "module",
