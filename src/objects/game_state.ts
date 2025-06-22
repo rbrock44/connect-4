@@ -162,7 +162,8 @@ export class GameState {
         };
     }
 
-    static fromJSON(data) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static fromJSON(data: any) {
         const state = GameState.fromMoves(data.moves);
         state.currentPlayer = data.currentPlayer;
         state.gameStatus = data.gameStatus;

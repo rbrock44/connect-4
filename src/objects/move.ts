@@ -12,7 +12,7 @@ export class Move {
     }
 
     // Validation
-    static isValid(move: Move, board) {
+    static isValid(move: Move, board: number[][]) {
         return move.column >= 0 &&
             move.column < 7 &&
             board[0][move.column] === 0;
@@ -28,7 +28,8 @@ export class Move {
         };
     }
 
-    static fromJSON(data) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static fromJSON(data: any) {
         return new Move(data.column, data.player, data.timestamp);
     }
 }

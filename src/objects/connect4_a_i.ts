@@ -1,3 +1,5 @@
+import type {GameState} from "./index";
+
 export class Connect4AI {
     player: number;
     opponent: number;
@@ -7,7 +9,8 @@ export class Connect4AI {
         this.opponent = player === 1 ? 2 : 1;
     }
 
-    makeMove(gameState) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    makeMove(gameState: GameState) {
         throw new Error('makeMove must be implemented by subclass');
     }
 }

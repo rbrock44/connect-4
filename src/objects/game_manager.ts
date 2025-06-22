@@ -94,8 +94,9 @@ export class GameManager {
         };
     }
 
-    importGame(data) {
-        this.gameState = GameState.fromJSON(data.gameState);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    importGame(data: any) {
+        this.gameState = GameState.fromJSON(data);
         this.currentMoveIndex = data.currentMoveIndex;
         this.maxMoveIndex = data.maxMoveIndex;
     }
