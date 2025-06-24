@@ -1,4 +1,4 @@
-export enum GameStatus = {
+export const GameStatus = {
    PLAYING = 'playing',
    WON = 'won',
    DRAW = 'draw',
