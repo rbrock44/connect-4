@@ -8,7 +8,7 @@ const Board = () => {
     };
 
     const [board, setBoard] = useState(createEmptyBoard);
-    const [hoveredColumn, setHoveredColumn] = useState(null);
+    // const [hoveredColumn, setHoveredColumn] = useState(null);
 
     const handlePieceClick = (row: number, col: number) => {
         // Placeholder for game logic - for now just toggle between states for demo

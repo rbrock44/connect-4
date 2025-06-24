@@ -1,6 +1,6 @@
-export { Connect4AI } from './connect4_a_i';
-export { GameState } from './game_state';
-export { GameManager } from './game_manager';
+export { Connect4AI } from './connect4-a-i';
+export { GameState } from './game-state';
+export { GameManager } from './game-manager';
 export { Move } from './move';
 
 export { AIDifficulty } from './ai-difficulty';
