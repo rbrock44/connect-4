@@ -1,6 +1,6 @@
 export const AIDifficulty = {
-    EASY = 'easy',
-    MEDIUM = 'medium',
-    HARD = 'hard',
-    ITERATIVE = 'iterative'
+    EASY : 'easy',
+    MEDIUM : 'medium',
+    HARD : 'hard',
+    ITERATIVE : 'iterative'
 };
