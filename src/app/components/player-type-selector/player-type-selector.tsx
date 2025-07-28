@@ -1,7 +1,7 @@
 const PlayerTypeSelector = (
     { 
         value = 'human',
-        onChange = (val: string) => {}, 
+        onChange = (_: string) => {}, 
         isDisabled = false 
     }
 ) => {
