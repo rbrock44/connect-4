@@ -1,4 +1,13 @@
-const GamePiece = ({ state = 'blank', onClick = ()=>{}, isHoverable = false }) => {
+const GamePiece = (
+    { 
+        state = 'blank', 
+        onClick = ()=>{}, 
+        isSmall = false,
+        isHoverable = false,
+        isSelected = false,
+        isDisabled = false, 
+    }
+) => {
     const getStateClasses = () => {
         switch (state) {
             case 'yellow':
@@ -10,19 +19,32 @@ const GamePiece = ({ state = 'blank', onClick = ()=>{}, isHoverable = false }) =
         }
     };
 
-    const hoverClasses = isHoverable && state === 'blank'
+    const hoverClasses = isHoverable
         ? 'hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 cursor-pointer transition-all duration-200'
         : '';
+
+    const selectedClasses = isSelected
+        ? 'outline outline-4 outline-blue-400'
+        : '';   
+    
+    const disabledClasses = isDisabled
+        ? 'opacity-40 cursor-not-allowed pointer-events-none'
+        : ''; 
+    
+    const heightClasses = isSmall ? 'w-8 h-8' : 'w-12 h-12'; 
 
     return (
         <div
             className={`
-        w-12 h-12 rounded-full border-2 transition-all duration-300
+        ${heightClasses}
+        rounded-full border-2 transition-all duration-300
         ${getStateClasses()}
         ${hoverClasses}
+        ${selectedClasses}
+        ${disabledClasses}
         relative overflow-hidden
       `}
-            onClick={onClick}
+            onClick={!isDisabled ? onClick : undefined}
         >
             <div className="absolute top-1 left-1 w-3 h-3 bg-white/30 rounded-full blur-sm" />
 
