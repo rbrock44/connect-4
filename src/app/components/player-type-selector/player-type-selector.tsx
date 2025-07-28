@@ -33,7 +33,7 @@ const PlayerTypeSelector = (
             </button>
           ))}
         </div>
-        <div className="flex gap-2 flex-wrap w-100">
+        <div className="flex gap-2 flex-wrap w-full">
           {aiButtons.map(({ value: val, label }) => (
             <button
               key={val}
