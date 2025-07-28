@@ -1,6 +1,8 @@
+import { BLANK, RED, YELLOW } from "../../constants";
+
 const GamePiece = (
     { 
-        state = 'blank', 
+        state = BLANK, 
         onClick = ()=>{}, 
         isSmall = false,
         isHoverable = false,
@@ -10,9 +12,9 @@ const GamePiece = (
 ) => {
     const getStateClasses = () => {
         switch (state) {
-            case 'yellow':
+            case YELLOW:
                 return 'bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30 border-yellow-600';
-            case 'red':
+            case RED:
                 return 'bg-gradient-to-br from-red-400 via-red-500 to-red-700 shadow-lg shadow-red-500/30 border-red-700';
             default:
                 return 'bg-gradient-to-br from-slate-100 to-slate-200 shadow-inner border-slate-300';
@@ -31,6 +33,7 @@ const GamePiece = (
         ? 'opacity-40 cursor-not-allowed pointer-events-none'
         : ''; 
     
+    // TODO: this needs to handle mobile, the current setup is two hardcoded sizes, the smaller one for the board one for the player color choice    
     const heightClasses = isSmall ? 'w-8 h-8' : 'w-12 h-12'; 
 
     return (

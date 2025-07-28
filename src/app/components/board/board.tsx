@@ -1,17 +1,8 @@
 import { useState } from "react";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
+import { BLANK, createEmptyBoard, EASY, HARD, HUMAN, ITERATIVE, MEDIUM, RED, ROWS, YELLOW } from "../../constants";
 
-const rows = 6;
-const columns = 7;
-
-const createEmptyBoard = () => {
-    return Array(rows).fill(0).map(() => Array(columns).fill(BLANK));
-};
-
-const BLANK = 'blank';
-const YELLOW = 'yellow';
-const RED = 'red'
 
 const Board = () => {    
     const [board, setBoard] = useState(createEmptyBoard);
@@ -37,7 +28,6 @@ const Board = () => {
                 newBoard[row][col] = BLANK;
             }
         } else {
-            // determine who's move for color (red or yellow)
             let color = player2Color;
 
             if (firstPlayerTurn) {
@@ -45,31 +35,51 @@ const Board = () => {
             }
 
             //determine which row of the column for the piece
-            let foundIndex = rows;
-            for (let i = rows - 1; i >= 0; i--) {
+            let foundIndex = ROWS;
+            for (let i = ROWS - 1; i >= 0; i--) {
                 if (newBoard[i][col] === BLANK) {
                     foundIndex = i;
                     break;
                 }
             }            
 
-            if (foundIndex === rows) {
+            if (foundIndex === ROWS) {
                 // row is full -- invalid move
+                // TODO: shake/wiggle or other notification action that move is invalid
             } else {
                 newBoard[foundIndex][col] = color;
 
                 // invert who's turn it is
                 setFirstPlayerTurn(!firstPlayerTurn);
+                checkNextMove();
             }
         }
         
         setBoard(newBoard);
     };
 
+    const checkNextMove = () => {
+        if (player2Type !== HUMAN) {
+            makeAIMove(player2Type)
+        }
+    };
+
+    const makeAIMove = (type: string) => {
+        if (type === EASY) {
+
+        } else if (type === MEDIUM) {
+            
+        } else if (type === HARD) {
+            
+        } else if (type === ITERATIVE) {
+            
+        }
+    };
+
     const handleColorClick = (player1Color: string, player2Color: string) => {
         setPlayer1Color(player1Color); 
         setPlayer2Color(player2Color);
-    }
+    };
 
     return (
         <div className="flex flex-col items-center p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
@@ -79,7 +89,7 @@ const Board = () => {
 
             <div className="relative">
                 <div
-                    className={`flex flex-col p-2 mb-2 gap-2 w-full ${
+                    className={`flex flex-col p-2 mb-2 gap-2 ${
                         gameStarted ? 'border border-red-400 rounded' : ''
                     }`}
                     >
@@ -89,7 +99,6 @@ const Board = () => {
                         </span>
                     )}
 
-                    {/* Row 1: Player Color Selection */}
                     <div className="flex items-center text-blue-200 pb-2">
                         <p className="text-sm pr-4">Player 1 Color:</p>
                         <div className="pr-4">
@@ -120,7 +129,6 @@ const Board = () => {
                             isDisabled={gameStarted}
                         />
                     </div>
-                    {/* Row 2: Player Type Selection */}
                     
                 </div>
 
