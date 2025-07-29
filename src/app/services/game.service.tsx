@@ -84,8 +84,8 @@ export function hasFourInARow(board: string[][]): boolean {
 }
 
 export function whoHasFourInARow(player1Color: string, board: string[][]): string {
-    const determinePlayer = (cell: string, player1Color: string) => {
-        return cell == player1Color ? PLAYER1 : PLAYER2
+    const determinePlayer = (cell: string, playerColor: string) => {
+        return cell === playerColor ? PLAYER1 : PLAYER2
     }
 
     for (let row = 0; row < board.length; row++) {
