@@ -28,7 +28,7 @@ export function isIterativeAI(player2Type: string): boolean {
     return player2Type === ITERATIVE;
 }
 
-function isPlayer2Human(player2Type: string): boolean {
+export function isPlayer2Human(player2Type: string): boolean {
     return player2Type === HUMAN;
 }
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BLANK, createEmptyBoard, RED, ROWS, YELLOW } from "../../constants";
-import { determineWinningMessage, getColorForMove, getWinnerOrDraw, hasFourInARow, isFullGameBoard, isIterativeAI, makeAIMove, shouldMakeNextMove } from "../../services/game.service";
+import { determineWinningMessage, getColorForMove, getWinnerOrDraw, hasFourInARow, isFullGameBoard, isIterativeAI, isPlayer2Human, makeAIMove, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 
@@ -39,9 +39,6 @@ const Board = () => {
             newBoard[foundIndex][col] = color;
             setBoard(newBoard);
 
-            // invert who's turn it is
-            setFirstPlayerTurn(!firstPlayerTurn);
-
             //check to see if anybody won or there's a draw, else next move please
             const isFullBoard = isFullGameBoard(newBoard);
             const hasWinner = hasFourInARow(newBoard);
@@ -55,6 +52,9 @@ const Board = () => {
                 if (shouldMakeNextMove(player2Type)) {
                     newBoard = makeAIMove(player2Type, player2Color, newBoard);
                     setBoard(newBoard);
+                } else {
+                     // human player -> invert who's turn it is
+                    setFirstPlayerTurn(!firstPlayerTurn);
                 }
             }
         }
@@ -82,6 +82,10 @@ const Board = () => {
         handleRestart();
     };
 
+    function nextMoveMessage(): string {
+        return firstPlayerTurn ? 'Player 1 Turn' : (isPlayer2Human(player2Type) ? 'Player 2 Turn' : '');
+    }
+
     return (
         <div className="flex flex-col items-center p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
             <h1 className="text-4xl font-bold text-white mb-8 text-center">
@@ -101,7 +105,7 @@ const Board = () => {
                     )}
 
                     <div className="flex items-center text-blue-200 pb-2">
-                        <p className="text-sm pr-4">Player 1 Color:</p>
+                        <p className="text-sm pr-4">Player 1:</p>
                         <div className="pr-4">
                             <GamePiece
                                 state={YELLOW}
@@ -188,10 +192,10 @@ const Board = () => {
                     </button>
                 </div>
                 <p className="text-sm">
-                    Click any column/circle to lay a game piece
+                    Click any column to lay a game piece
                 </p>
-                <p className="text-xs mt-2 opacity-75">
-                    This is a demo board. Game logic will be implemented separately.
+                <p className="text-xs mt-1 opacity-75">
+                    {nextMoveMessage()}
                 </p>
             </div>
         </div>
