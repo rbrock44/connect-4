@@ -17,7 +17,7 @@ const Board = () => {
     
     // const [hoveredColumn, setHoveredColumn] = useState(null);
 
-    const handlePieceClick = (row: number, col: number) => {
+    const handlePieceClick = (col: number) => {
         let newBoard = [...board];
         setGameStarted(true);
 
@@ -144,7 +144,7 @@ const Board = () => {
                                     <div key={`${rowIndex}-${colIndex}`} className="relative">
                                         <GamePiece
                                             state={cell}
-                                            onClick={() => handlePieceClick(rowIndex, colIndex)}
+                                            onClick={() => handlePieceClick(colIndex)}
                                             isHoverable={!gameOver}
                                         />
                                     </div>

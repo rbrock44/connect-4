@@ -1,18 +1,19 @@
-import { BLANK, COLUMNS, DRAW, EASY, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, ROWS } from "../constants";
+import { AIEasy, AIHard, AIIterative, AIMedium } from "../ai";
+import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, ROWS } from "../constants";
 
 export function makeAIMove(type: string, color: string, board: string[][]): string[][] {
-    // const ai = 
-    if (type === EASY) {
-
-    } else if (type === MEDIUM) {
-
+    let ai = new AIEasy(color);
+    if (type === MEDIUM) {
+        ai = new AIMedium(color);
     } else if (type === HARD) {
-
+        ai = new AIHard(color);
     } else if (type === ITERATIVE) {
-
+        ai = new AIIterative(color);
     }
 
-    return board;
+    const newBoard = ai.makeMove(board);
+
+    return newBoard;
 };
 
 export function getColorForMove(player1Color: string, player2Color: string, firstPlayerTurn: boolean): string {

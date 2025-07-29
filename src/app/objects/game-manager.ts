@@ -1,4 +1,4 @@
-import {GameState, Move} from "./index";
+import {GameState} from "./index";
 
 export class GameManager {
     gameState: GameState;
@@ -11,33 +11,13 @@ export class GameManager {
         this.maxMoveIndex = 0;
     }
 
-    makeMove(column: number) {
-        if (this.gameState.isGameOver()) {
-            throw new Error('Game is already over');
-        }
-
-        const move = new Move(column, this.gameState.currentPlayer);
-        const newState = this.gameState.applyMove(move);
-
-        // If we're not at the latest move, we need to truncate future moves
-        if (this.currentMoveIndex < this.maxMoveIndex) {
-            this.maxMoveIndex = this.currentMoveIndex;
-        }
-
-        this.gameState = newState;
-        this.currentMoveIndex++;
-        this.maxMoveIndex = this.currentMoveIndex;
-
-        return this.gameState;
-    }
-
     undo() {
         if (this.currentMoveIndex <= 0) {
             return null;
         }
 
         this.currentMoveIndex--;
-        this.gameState = this.gameState.getStateAtMove(this.currentMoveIndex);
+        // this.gameState = this.gameState.getBoardAtMove(this.currentMoveIndex);
         return this.gameState;
     }
 
@@ -47,7 +27,7 @@ export class GameManager {
         }
 
         this.currentMoveIndex++;
-        this.gameState = this.gameState.getStateAtMove(this.currentMoveIndex);
+        // this.gameState = this.gameState.getBoardAtMove(this.currentMoveIndex);
         return this.gameState;
     }
 
@@ -65,7 +45,7 @@ export class GameManager {
         }
 
         this.currentMoveIndex = moveIndex;
-        this.gameState = this.gameState.getStateAtMove(moveIndex);
+        // this.gameState = this.gameState.getBoardAtMove(moveIndex);
         return this.gameState;
     }
 
@@ -73,31 +53,5 @@ export class GameManager {
         this.gameState = new GameState();
         this.currentMoveIndex = 0;
         this.maxMoveIndex = 0;
-    }
-
-    // Game analysis
-    getMoveHistory() {
-        return this.gameState.moves.map((move, index) => ({
-            moveNumber: index + 1,
-            column: move.column,
-            player: move.player,
-            timestamp: move.timestamp
-        }));
-    }
-
-    exportGame() {
-        return {
-            gameState: this.gameState.toJSON(),
-            currentMoveIndex: this.currentMoveIndex,
-            maxMoveIndex: this.maxMoveIndex,
-            exportedAt: Date.now()
-        };
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    importGame(data: any) {
-        this.gameState = GameState.fromJSON(data);
-        this.currentMoveIndex = data.currentMoveIndex;
-        this.maxMoveIndex = data.maxMoveIndex;
     }
 }
