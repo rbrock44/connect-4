@@ -1,5 +1,5 @@
 import { AIEasy, AIHard, AIIterative, AIMedium } from "../ai";
-import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, ROWS } from "../constants";
+import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS } from "../constants";
 import type { CheckWin } from "../objects";
 
 export function makeAIMove(type: string, color: string, board: string[][]): string[][] {
@@ -34,7 +34,7 @@ export function isPlayer2Human(player2Type: string): boolean {
 }
 
 export function isGameOver(board: string[][]): boolean {
-    return hasFourInARow(board) || isFullGameBoard(board);
+    return checkWin(RED, board).hasWon || isFullGameBoard(board);
 };
 
 export function isFullGameBoard(board: string[][]): boolean {
