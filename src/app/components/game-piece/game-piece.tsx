@@ -33,7 +33,7 @@ const GamePiece = (
         ? 'opacity-40 cursor-not-allowed pointer-events-none'
         : ''; 
     
-    // TODO: this needs to handle mobile, the current setup is two hardcoded sizes, the smaller one for the board one for the player color choice    
+    // TODO: this needs to handle mobile, the current setup is two hardcoded sizes, one for the board, the smaller one for the player color choice    
     const heightClasses = isSmall ? 'w-8 h-8' : 'w-12 h-12'; 
 
     return (
@@ -50,7 +50,6 @@ const GamePiece = (
             onClick={!isDisabled ? onClick : undefined}
         >
             <div className="absolute top-1 left-1 w-3 h-3 bg-white/30 rounded-full blur-sm" />
-
             <div className="absolute inset-0 rounded-full shadow-inner" />
         </div>
     );

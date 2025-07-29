@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { BLANK, createEmptyBoard, RED, ROWS, YELLOW } from "../../constants";
-import { determineWinningMessage, getColorForMove, getWinnerOrDraw, hasFourInARow, isFullGameBoard, isIterativeAI, isPlayer2Human, makeAIMove, shouldMakeNextMove } from "../../services/game.service";
+import { BLANK, createEmptyBoard, DRAW, RED, ROWS, YELLOW } from "../../constants";
+import type { CheckWin } from "../../objects";
+import { checkWin, determineWinningMessage, getColorForMove, isFullGameBoard, isIterativeAI, isPlayer2Human, makeAIMove, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 
@@ -13,8 +14,8 @@ const Board = () => {
     const [player2Color, setPlayer2Color] = useState(RED);
     const [player2Type, setPlayer2Type] = useState('human');
     const [winner, setWinner] = useState('');
-    const [winningMessage, setWinningMessage] = useState('');
-    
+    const [winningCells, setWinningCells] = useState<number[][]>([]);
+
     // const [hoveredColumn, setHoveredColumn] = useState(null);
 
     const handlePieceClick = (col: number) => {
@@ -41,13 +42,16 @@ const Board = () => {
 
             //check to see if anybody won or there's a draw, else next move please
             const isFullBoard = isFullGameBoard(newBoard);
-            const hasWinner = hasFourInARow(newBoard);
-            const isGameOver = isFullBoard || hasWinner;
+            const checkWinObject: CheckWin = checkWin(player1Color, newBoard);
+            const isGameOver = isFullBoard || checkWinObject.hasWon;
             if (isGameOver) {
                 setGameOver(true);
-                const newWinner = getWinnerOrDraw(hasWinner, player1Color, newBoard);
+                let newWinner = DRAW
+                if (checkWinObject.hasWon) {
+                    setWinningCells(checkWinObject.winningCells);
+                    newWinner = checkWinObject.winningPlayer; 
+                } 
                 setWinner(newWinner);
-                setWinningMessage(determineWinningMessage(winner, player2Type));
             } else {
                 if (shouldMakeNextMove(player2Type)) {
                     newBoard = makeAIMove(player2Type, player2Color, newBoard);
@@ -65,6 +69,8 @@ const Board = () => {
     const handleColorClick = (player1Color: string, player2Color: string) => {
         setPlayer1Color(player1Color); 
         setPlayer2Color(player2Color);
+
+        // TODO: add player 1 color to url when not YELLOW, remove from url when YELLOW
     };
 
     const handleRestart = () => {
@@ -75,6 +81,8 @@ const Board = () => {
         setGameStarted(false);
         setGameOver(false);
         setWinner('');
+        setFirstPlayerTurn(true);
+        setWinningCells([]);
     };
 
     const handleRestartWarning = () => {
@@ -82,8 +90,21 @@ const Board = () => {
         handleRestart();
     };
 
+    const isWinningCell = (row: number, col: number): boolean => {
+        return winningCells.some(([r, c]) => r === row && c === col);
+    };
+
+    function handlePlayer2Change(val: string): void {
+        setPlayer2Type(val);
+
+        // TODO: add player 2 to url when not HUMAN, remove from url when HUMAN
+    }
+
     function nextMoveMessage(): string {
-        return firstPlayerTurn ? 'Player 1 Turn' : (isPlayer2Human(player2Type) ? 'Player 2 Turn' : '');
+        if (gameOver) {
+            return '';
+        } 
+        return firstPlayerTurn ? `Player 1's Turn` : (isPlayer2Human(player2Type) ? `Player 2's Turn` : '');
     }
 
     return (
@@ -130,7 +151,7 @@ const Board = () => {
                         <p className="text-sm pr-4 whitespace-nowrap">Player 2:</p>
                         <PlayerTypeSelector
                             value={player2Type}
-                            onChange={(val: string) => setPlayer2Type(val)}
+                            onChange={(val: string) => handlePlayer2Change(val)}
                             isDisabled={gameStarted}
                         />
                     </div>
@@ -152,6 +173,7 @@ const Board = () => {
                                 row.map((cell, colIndex) => (
                                     <div key={`${rowIndex}-${colIndex}`} className="relative">
                                         <GamePiece
+                                            isSelected={isWinningCell(rowIndex, colIndex)}
                                             state={cell}
                                             onClick={() => handlePieceClick(colIndex)}
                                             isHoverable={!gameOver}
@@ -164,9 +186,9 @@ const Board = () => {
 
                     {/* Overlay */}
                     {gameOver && (
-                        <div className="absolute inset-0 bg-zinc-500 opacity-90 rounded-2xl flex flex-col items-center justify-center text-white z-10">
+                        <div className="absolute inset-0 bg-zinc-500 opacity-80 rounded-2xl flex flex-col items-center justify-center text-white z-10">
                             <h2 className="text-3xl font-bold mb-2">Game Over</h2>
-                            <p className="text-xl">{winningMessage}</p>
+                            <p className="text-xl">{determineWinningMessage(winner, player2Type)}</p>
                             <button
                                 onClick={handleRestart}
                                 className="mt-6 !bg-amber-700 px-4 py-2 rounded-full shadow hover:bg-blue-100 transition"
