@@ -1,84 +1,80 @@
 import { useState } from "react";
+import { BLANK, createEmptyBoard, RED, ROWS, YELLOW } from "../../constants";
+import { determineWinningMessage, getColorForMove, getWinnerOrDraw, hasFourInARow, isFullGameBoard, isIterativeAI, makeAIMove, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
-import { BLANK, createEmptyBoard, EASY, HARD, HUMAN, ITERATIVE, MEDIUM, RED, ROWS, YELLOW } from "../../constants";
-
 
 const Board = () => {    
     const [board, setBoard] = useState(createEmptyBoard);
     const [firstPlayerTurn, setFirstPlayerTurn] = useState(true);
     const [gameStarted, setGameStarted] = useState(false);
-    const [player1Color, setPlayer1Color] = useState(RED);
-    const [player2Color, setPlayer2Color] = useState(YELLOW);
+    const [gameOver, setGameOver] = useState(false);
+    const [player1Color, setPlayer1Color] = useState(YELLOW);
+    const [player2Color, setPlayer2Color] = useState(RED);
     const [player2Type, setPlayer2Type] = useState('human');
+    const [winner, setWinner] = useState('');
+    const [winningMessage, setWinningMessage] = useState('');
+    
     // const [hoveredColumn, setHoveredColumn] = useState(null);
 
     const handlePieceClick = (row: number, col: number) => {
-        const newBoard = [...board];
-        const demoLogic = false;
+        let newBoard = [...board];
         setGameStarted(true);
 
-        if (demoLogic) {
-            // Placeholder for game logic - for now just toggle between states for demo
-            if (newBoard[row][col] === BLANK) {
-                newBoard[row][col] = YELLOW;
-            } else if (newBoard[row][col] === YELLOW) {
-                newBoard[row][col] = RED;
-            } else {
-                newBoard[row][col] = BLANK;
+        const color = getColorForMove(player1Color, player2Color, firstPlayerTurn);
+
+        //determine which row of the column for the piece to be played
+        let foundIndex = ROWS;
+        for (let i = ROWS - 1; i >= 0; i--) {
+            if (newBoard[i][col] === BLANK) {
+                foundIndex = i;
+                break;
             }
+        }            
+
+        if (foundIndex === ROWS) {
+            // row is full -- invalid move
+            // TODO: shake/wiggle or other notification action that move is invalid
         } else {
-            let color = player2Color;
+            newBoard[foundIndex][col] = color;
+            setBoard(newBoard);
 
-            if (firstPlayerTurn) {
-                color = player1Color;
-            }
+            // invert who's turn it is
+            setFirstPlayerTurn(!firstPlayerTurn);
 
-            //determine which row of the column for the piece
-            let foundIndex = ROWS;
-            for (let i = ROWS - 1; i >= 0; i--) {
-                if (newBoard[i][col] === BLANK) {
-                    foundIndex = i;
-                    break;
-                }
-            }            
-
-            if (foundIndex === ROWS) {
-                // row is full -- invalid move
-                // TODO: shake/wiggle or other notification action that move is invalid
+            //check to see if anybody won or there's a draw, else next move please
+            const isFullBoard = isFullGameBoard(newBoard);
+            const hasWinner = hasFourInARow(newBoard);
+            const isGameOver = isFullBoard || hasWinner;
+            if (isGameOver) {
+                setGameOver(true);
+                const newWinner = getWinnerOrDraw(hasWinner, player1Color, newBoard);
+                setWinner(newWinner);
+                setWinningMessage(determineWinningMessage(winner, player2Type));
             } else {
-                newBoard[foundIndex][col] = color;
-
-                // invert who's turn it is
-                setFirstPlayerTurn(!firstPlayerTurn);
-                checkNextMove();
+                if (shouldMakeNextMove(player2Type)) {
+                    newBoard = makeAIMove(player2Type, player2Color, newBoard);
+                    setBoard(newBoard);
+                }
             }
         }
         
-        setBoard(newBoard);
-    };
-
-    const checkNextMove = () => {
-        if (player2Type !== HUMAN) {
-            makeAIMove(player2Type)
-        }
-    };
-
-    const makeAIMove = (type: string) => {
-        if (type === EASY) {
-
-        } else if (type === MEDIUM) {
-            
-        } else if (type === HARD) {
-            
-        } else if (type === ITERATIVE) {
-            
-        }
+        // setBoard(newBoard);
     };
 
     const handleColorClick = (player1Color: string, player2Color: string) => {
         setPlayer1Color(player1Color); 
         setPlayer2Color(player2Color);
+    };
+
+    const handleRestart = () => {
+        if (gameOver && isIterativeAI(player2Type)) {
+            // TODO: save board off for iterative AI
+        } 
+        setBoard(createEmptyBoard);
+        setGameStarted(false);
+        setGameOver(false);
+        setWinner('');
     };
 
     return (
@@ -132,33 +128,60 @@ const Board = () => {
                     
                 </div>
 
-                <div
-                    className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-6 rounded-2xl shadow-2xl border-4 border-blue-500"
-                    style={{
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)'
-                    }}
-                >
-                    <div className="grid grid-cols-7 gap-3 bg-gradient-to-br from-blue-700 to-blue-800 p-4 rounded-xl">
-                        {board.map((row, rowIndex) =>
-                            row.map((cell, colIndex) => (
-                                <div key={`${rowIndex}-${colIndex}`} className="relative">
-                                    <GamePiece
-                                        state={cell}
-                                        onClick={() => handlePieceClick(rowIndex, colIndex)}
-                                        isHoverable={true}
-                                    />
-                                </div>
-                            ))
+                <div className="relative">
+                    <div
+                        className={`bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-6 rounded-2xl shadow-2xl border-4 border-blue-500 ${
+                            gameOver ? 'pointer-events-none opacity-50' : ''
+                        }`}
+                        style={{
+                            boxShadow:
+                            '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)'
+                        }}
+                    >
+                        <div className="grid grid-cols-7 gap-3 bg-gradient-to-br from-blue-700 to-blue-800 p-4 rounded-xl">
+                            {board.map((row, rowIndex) =>
+                                row.map((cell, colIndex) => (
+                                    <div key={`${rowIndex}-${colIndex}`} className="relative">
+                                        <GamePiece
+                                            state={cell}
+                                            onClick={() => handlePieceClick(rowIndex, colIndex)}
+                                            isHoverable={!gameOver}
+                                        />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Overlay */}
+                    {gameOver && (
+                        <div className="absolute inset-0 bg-zinc-500 opacity-90 rounded-2xl flex flex-col items-center justify-center text-white z-10">
+                            <h2 className="text-3xl font-bold mb-2">Game Over</h2>
+                            <p className="text-xl">{winningMessage}</p>
+                            <button
+                                onClick={handleRestart}
+                                className="mt-6 !bg-amber-700 px-4 py-2 rounded-full shadow hover:bg-blue-100 transition"
+                            >
+                                Play Again
+                            </button>
+                        </div>
                         )}
                     </div>
-                </div>
 
                 <div
                     className="absolute -bottom-2 left-0 right-0 h-8 bg-gradient-to-b from-blue-800/20 to-transparent rounded-b-2xl blur-sm"
                 />
             </div>
 
-            <div className="mt-8 text-center text-blue-200 max-w-md">
+            <div className="mt-8 text-center text-blue-200 max-w-md ">
+                <div className="text-center flex justify-center max-w-md">
+                    <button
+                        onClick={handleRestart}
+                        className="h-6 w-fit !p-2 mb-2 !bg-amber-700 rounded-full text-sm flex items-center justify-center shadow hover:bg-blue-100 transition"
+                    >
+                        Clear Board
+                    </button>
+                </div>
                 <p className="text-sm">
                     Click any column/circle to lay a game piece
                 </p>

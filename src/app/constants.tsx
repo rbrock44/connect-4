@@ -14,3 +14,7 @@ export const EASY = 'easy';
 export const MEDIUM = 'medium';
 export const HARD = 'hard';
 export const ITERATIVE = 'iterative';
+
+export const PLAYER1 = 'player1';
+export const PLAYER2 = 'player2';
+export const DRAW = 'draw';
