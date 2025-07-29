@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { BLANK, createEmptyBoard, DRAW, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { CheckWin } from "../../objects";
-import { checkWin, determineWinningMessage, getColorForMove, isFullGameBoard, isIterativeAI, isPlayer2Human, makeAIMove, shouldMakeNextMove } from "../../services/game.service";
+import { checkWin, determineWinningMessage, getColorForMove, isFullGameBoard, isIterativeAI, isPlayer2Human, getAIMove, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 
@@ -15,10 +15,12 @@ const Board = () => {
     const [player2Type, setPlayer2Type] = useState<PLAYER_TYPE>('human');
     const [winner, setWinner] = useState<string>('');
     const [winningCells, setWinningCells] = useState<number[][]>([]);
+    const [processingClick, setProcessingClick] = useState<boolean>(false);
 
     // const [hoveredColumn, setHoveredColumn] = useState(null);
 
     const handlePieceClick = (col: number) => {
+        setProcessingClick(true);
         let newBoard = [...board];
         setGameStarted(true);
 
@@ -38,7 +40,6 @@ const Board = () => {
             // TODO: shake/wiggle or other notification action that move is invalid
         } else {
             newBoard[foundIndex][col] = color;
-            setBoard(newBoard);
 
             //check to see if anybody won or there's a draw, else next move please
             const isFullBoard = isFullGameBoard(newBoard);
@@ -54,14 +55,19 @@ const Board = () => {
                 setWinner(newWinner);
             } else {
                 if (shouldMakeNextMove(player2Type)) {
-                    newBoard = makeAIMove(player2Type as AI_TYPE, player1Color, player2Color, newBoard);
-                    setBoard(newBoard);
+                    const move = getAIMove(player2Type as AI_TYPE, player1Color, player2Color, newBoard);
+                    
+                    newBoard[move[0]][move[1]] = player2Color;
                 } else {
                     // human player -> invert who's turn it is
                     setFirstPlayerTurn(!firstPlayerTurn);
                 }
             }
+
+            setBoard(newBoard);
         }
+
+        setProcessingClick(false);
     };
 
     const handleColorClick = (player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR) => {
@@ -193,6 +199,7 @@ const Board = () => {
                                             state={cell}
                                             onClick={() => handlePieceClick(colIndex)}
                                             isHoverable={!gameOver}
+                                            isDisabled={processingClick}
                                         />
                                     </div>
                                 ))
