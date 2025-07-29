@@ -77,6 +77,11 @@ const Board = () => {
         setWinner('');
     };
 
+    const handleRestartWarning = () => {
+        // TODO: create popup or something to confirms user wants to clear board (this cannot be reversed)
+        handleRestart();
+    };
+
     return (
         <div className="flex flex-col items-center p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
             <h1 className="text-4xl font-bold text-white mb-8 text-center">
@@ -176,7 +181,7 @@ const Board = () => {
             <div className="mt-8 text-center text-blue-200 max-w-md ">
                 <div className="text-center flex justify-center max-w-md">
                     <button
-                        onClick={handleRestart}
+                        onClick={handleRestartWarning}
                         className="h-6 w-fit !p-2 mb-2 !bg-amber-700 rounded-full text-sm flex items-center justify-center shadow hover:bg-blue-100 transition"
                     >
                         Clear Board
