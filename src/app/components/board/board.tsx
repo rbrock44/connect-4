@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { BLANK, createEmptyBoard, DRAW, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { CheckWin } from "../../objects";
 import { checkWin, determineWinningMessage, getColorForMove, isFullGameBoard, isIterativeAI, isPlayer2Human, getAIMove, shouldMakeNextMove } from "../../services/game.service";
