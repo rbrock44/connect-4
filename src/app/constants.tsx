@@ -17,6 +17,7 @@ export const MEDIUM = 'medium';
 export const HARD = 'hard';
 export const ITERATIVE = 'iterative';
 export type PLAYER_TYPE = 'human' | 'easy' | 'medium' | 'hard' | 'iterative'
+export type AI_TYPE = 'easy' | 'medium' | 'hard' | 'iterative'
 
 export const PLAYER1 = 'player1';
 export const PLAYER2 = 'player2';

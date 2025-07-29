@@ -1,18 +1,21 @@
 import { AIEasy, AIHard, AIIterative, AIMedium } from "../ai";
-import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../constants";
+import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../constants";
 import type { CheckWin } from "../objects";
 
-export function makeAIMove(type: string, color: string, board: COLOR[][]): COLOR[][] {
-    let ai = new AIEasy(color);
+export function makeAIMove(type: AI_TYPE, player1Color: PLAYER_COLOR, aiColor: PLAYER_COLOR, board: COLOR[][]): COLOR[][] {
+    let ai = new AIEasy(aiColor, player1Color);
     if (type === MEDIUM) {
-        ai = new AIMedium(color);
+        ai = new AIMedium(aiColor, player1Color);
     } else if (type === HARD) {
-        ai = new AIHard(color);
+        ai = new AIHard(aiColor, player1Color);
     } else if (type === ITERATIVE) {
-        ai = new AIIterative(color);
+        ai = new AIIterative(aiColor, player1Color);
     }
 
-    const newBoard = ai.makeMove(board);
+    const move = ai.getMove(board);
+
+    const newBoard = [...board];
+    newBoard[move[0]][move[1]] = aiColor;
 
     return newBoard;
 };
@@ -114,6 +117,8 @@ export function checkWin(player1Color: string, board: string[][]): CheckWin {
         winningPlayer: ''
     };
 }
+
+
 
 export function determineWinningMessage(winner: string, player2Type: PLAYER_TYPE): string {
     if (winner === DRAW) {
