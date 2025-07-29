@@ -1,7 +1,7 @@
 # Connect 4 (React + TypeScript + Vite)
 
 [Live Website](https://connect-4.ryan-brock.com/)
-This react application was created to play connect four against aother human or various AI difficulties
+This react application was created to play connect four against another human or various AI difficulties
 
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

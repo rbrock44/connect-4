@@ -1,8 +1,8 @@
 import { AIEasy, AIHard, AIIterative, AIMedium } from "../ai";
-import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS } from "../constants";
+import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../constants";
 import type { CheckWin } from "../objects";
 
-export function makeAIMove(type: string, color: string, board: string[][]): string[][] {
+export function makeAIMove(type: string, color: string, board: COLOR[][]): COLOR[][] {
     let ai = new AIEasy(color);
     if (type === MEDIUM) {
         ai = new AIMedium(color);
@@ -17,19 +17,19 @@ export function makeAIMove(type: string, color: string, board: string[][]): stri
     return newBoard;
 };
 
-export function getColorForMove(player1Color: string, player2Color: string, firstPlayerTurn: boolean): string {
+export function getColorForMove(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR, firstPlayerTurn: boolean): PLAYER_COLOR {
     return firstPlayerTurn ? player1Color : player2Color;
 }
 
-export function shouldMakeNextMove(player2Type: string): boolean {
+export function shouldMakeNextMove(player2Type: PLAYER_TYPE): boolean {
     return !isPlayer2Human(player2Type);
 }
 
-export function isIterativeAI(player2Type: string): boolean {
+export function isIterativeAI(player2Type: PLAYER_TYPE): boolean {
     return player2Type === ITERATIVE;
 }
 
-export function isPlayer2Human(player2Type: string): boolean {
+export function isPlayer2Human(player2Type: PLAYER_TYPE): boolean {
     return player2Type === HUMAN;
 }
 
@@ -115,7 +115,7 @@ export function checkWin(player1Color: string, board: string[][]): CheckWin {
     };
 }
 
-export function determineWinningMessage(winner: string, player2Type: string): string {
+export function determineWinningMessage(winner: string, player2Type: PLAYER_TYPE): string {
     if (winner === DRAW) {
         return `It's a Draw!`;
     } else if (winner === PLAYER1) {

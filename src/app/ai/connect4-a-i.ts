@@ -1,4 +1,4 @@
-import { RED } from "../constants";
+import { RED, type COLOR } from "../constants";
 
 export abstract class Connect4AI {
     color: string;
@@ -7,5 +7,5 @@ export abstract class Connect4AI {
         this.color = color;
     }
 
-    abstract makeMove(board: string[][]): string[][];
+    abstract makeMove(board: string[][]): COLOR[][];
 }

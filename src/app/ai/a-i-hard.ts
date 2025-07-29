@@ -1,4 +1,4 @@
-import { RED } from "../constants";
+import { RED, type COLOR } from "../constants";
 import { Connect4AI } from "./connect4-a-i";
 
 export class AIHard extends Connect4AI {
@@ -6,7 +6,7 @@ export class AIHard extends Connect4AI {
         super(color);
     }
 
-    makeMove(board: string[][]): string[][] {
+    makeMove(board: COLOR[][]): COLOR[][] {
         return board;
     };
 }

@@ -1,20 +1,25 @@
-import { EASY, HARD, HUMAN, ITERATIVE, MEDIUM } from "../../constants";
+import { EASY, HARD, HUMAN, ITERATIVE, MEDIUM, type PLAYER_TYPE } from "../../constants";
+
+interface PlayerButton {
+    value: PLAYER_TYPE;
+    label: string,
+}
 
 const PlayerTypeSelector = (
     { 
         value = HUMAN,
-        onChange = (_: string) => {}, 
+        onChange = (_: PLAYER_TYPE) => {}, 
         isDisabled = false 
     }
 ) => {
-    const humanButtons = [
+    const humanButtons: PlayerButton[] = [
         { value: HUMAN, label: 'Human' },
     ]
-    const aiButtons = [
-      { value: EASY, label: 'Easy', group: 'AI' },
-      { value: MEDIUM, label: 'Medium', group: 'AI' },
-      { value: HARD, label: 'Hard', group: 'AI' },
-      { value: ITERATIVE, label: 'Iterative', group: 'AI' }
+    const aiButtons: PlayerButton[] = [
+      { value: EASY, label: 'Easy'},
+      { value: MEDIUM, label: 'Medium'},
+      { value: HARD, label: 'Hard'},
+      { value: ITERATIVE, label: 'Iterative'},
     ];
   
     return (
