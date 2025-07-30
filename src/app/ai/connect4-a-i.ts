@@ -23,6 +23,17 @@ export abstract class Connect4AI {
         return [-1, -1];
     }
 
+    protected findWinningMove(validMoves: number[][], board: COLOR[][]): number[] {
+        for (const [row, column] of validMoves) {
+            const testBoard = board.map(row => [...row]);
+            testBoard[row][column] = this.color;
+            if (isGameOver(testBoard)) {
+                return [row, column]
+            }
+        }
+        return [-1, -1];
+    }
+
     protected getValidMoves(board: COLOR[][]): number[][] {
         let blanks: number[][] = [];
         const numRows = board.length;
@@ -38,5 +49,19 @@ export abstract class Connect4AI {
         }
 
         return blanks;
+    }
+
+    protected findStrategicMove(validMoves: number[][], board: COLOR[][], chance: number = 0.6): number[] {
+        const centerCol = 3;
+        
+        const centerMoves = validMoves.filter(([_, col]) => 
+            Math.abs(col - centerCol) <= 1
+        );
+        
+        if (centerMoves.length > 0 && Math.random() <= chance) {
+            return centerMoves[Math.floor(Math.random() * centerMoves.length)];
+        }
+        
+        return [-1, -1];
     }
 }

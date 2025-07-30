@@ -131,8 +131,6 @@ function checkStatus(player1Color: string, board: string[][]): CheckWin {
     };
 }
 
-
-
 export function determineWinningMessage(winner: string, player2Type: PLAYER_TYPE): string {
     if (winner === DRAW) {
         return `It's a Draw!`;

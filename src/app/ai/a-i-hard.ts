@@ -7,17 +7,23 @@ export class AIHard extends Connect4AI {
     }
 
     getMove(board: COLOR[][]): number[] {
-        //TODO: upgrade AI from easu
         const validMoves: number[][] = this.getValidMoves(board);
-
-        // 20% chance to look for threats, 80% random
-        if (Math.random() < 0.2) {
-            const blockingMove: number[] = this.findImmediateThreat(validMoves, board);
-            if (blockingMove[0] !== -1) {
-                return blockingMove;
-            }
+        
+        const winningMove = this.findWinningMove(validMoves, board);
+        if (winningMove[0] !== -1) {
+            return winningMove;
         }
-
+        
+        const blockingMove = this.findImmediateThreat(validMoves, board);
+        if (blockingMove[0] !== -1) {
+            return blockingMove;
+        }
+    
+        const strategicMove = this.findStrategicMove(validMoves, board, 1.0);
+        if (strategicMove[0] !== -1) {
+            return strategicMove;
+        }
+        
         const randomIndex = Math.floor(Math.random() * validMoves.length);
         return validMoves[randomIndex];
     };
