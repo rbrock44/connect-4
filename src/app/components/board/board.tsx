@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { BLANK, createEmptyBoard, DRAW, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
-import type { CheckWin } from "../../objects";
-import { checkWin, determineWinningMessage, getColorForMove, isFullGameBoard, isIterativeAI, isPlayer2Human, getAIMove, shouldMakeNextMove } from "../../services/game.service";
+import { BLANK, createEmptyBoard, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
+import type { Status } from "../../objects";
+import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 
@@ -21,7 +21,7 @@ const Board = () => {
 
     const handlePieceClick = (col: number) => {
         setProcessingClick(true);
-        let newBoard = [...board];
+        let newBoard = board.map(row => [...row]);
         setGameStarted(true);
 
         const color = getColorForMove(player1Color, player2Color, firstPlayerTurn);
@@ -40,24 +40,24 @@ const Board = () => {
             // TODO: shake/wiggle or other notification action that move is invalid
         } else {
             newBoard[foundIndex][col] = color;
+            console.log('PLAYER 1 MOVE: ', foundIndex, col)
 
             //check to see if anybody won or there's a draw, else next move please
-            const isFullBoard = isFullGameBoard(newBoard);
-            const checkWinObject: CheckWin = checkWin(player1Color, newBoard);
-            const isGameOver = isFullBoard || checkWinObject.hasWon;
-            if (isGameOver) {
-                setGameOver(true);
-                let newWinner = DRAW
-                if (checkWinObject.hasWon) {
-                    setWinningCells(checkWinObject.winningCells);
-                    newWinner = checkWinObject.winningPlayer;
-                }
-                setWinner(newWinner);
+            const status: Status = checkEverything(player1Color, newBoard);
+            if (status.isGameOver) {
+                handleGameOver(status);
             } else {
                 if (shouldMakeNextMove(player2Type)) {
-                    const move = getAIMove(player2Type as AI_TYPE, player1Color, player2Color, newBoard);
+                    const dummyBoard = newBoard.map(row => [...row]);
+                    const move = getAIMove(player2Type as AI_TYPE, player1Color, player2Color, dummyBoard);
                     
                     newBoard[move[0]][move[1]] = player2Color;
+                    console.log('AI MOVE: ', move[0], move[1])
+
+                    const newStatus: Status = checkEverything(player1Color, newBoard);
+                    if (newStatus.isGameOver) {
+                        handleGameOver(newStatus);
+                    }
                 } else {
                     // human player -> invert who's turn it is
                     setFirstPlayerTurn(!firstPlayerTurn);
@@ -65,9 +65,16 @@ const Board = () => {
             }
 
             setBoard(newBoard);
+            console.log('newBoard: ', newBoard)
         }
 
         setProcessingClick(false);
+    };
+
+    function handleGameOver(status: Status): void {
+        setGameOver(true);
+        setWinningCells(status.winningCells);
+        setWinner(status.winner);
     };
 
     const handleColorClick = (player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR) => {
@@ -95,7 +102,7 @@ const Board = () => {
     };
 
     const isWinningCell = (row: number, col: number): boolean => {
-        return winningCells.some(([r, c]) => r === row && c === col);
+        return winningCells.length > 0 && winningCells.some(([r, c]) => r === row && c === col);
     };
 
     function handlePlayer2Change(val: PLAYER_TYPE): void {

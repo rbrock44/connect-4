@@ -14,7 +14,7 @@ export abstract class Connect4AI {
 
     protected findImmediateThreat(validMoves: number[][], board: COLOR[][]): number[] {
         for (const [row, column] of validMoves) {
-            const testBoard = [...board];
+            const testBoard = board.map(row => [...row]);
             testBoard[row][column] = this.player1Color;
             if (isGameOver(testBoard)) {
                 return [row, column]

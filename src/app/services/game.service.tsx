@@ -1,6 +1,6 @@
 import { AIEasy, AIHard, AIIterative, AIMedium } from "../ai";
 import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../constants";
-import type { CheckWin } from "../objects";
+import type { CheckWin, Status } from "../objects";
 
 export function getAIMove(type: AI_TYPE, player1Color: PLAYER_COLOR, aiColor: PLAYER_COLOR, board: COLOR[][]): number[] {
     let ai = new AIEasy(aiColor, player1Color);
@@ -32,14 +32,32 @@ export function isPlayer2Human(player2Type: PLAYER_TYPE): boolean {
 }
 
 export function isGameOver(board: string[][]): boolean {
-    return checkWin(RED, board).hasWon || isFullGameBoard(board);
+    return checkStatus(RED, board).hasWon || isFullGameBoard(board);
 };
 
-export function isFullGameBoard(board: string[][]): boolean {
+function isFullGameBoard(board: string[][]): boolean {
     return !board.some(row => row.includes(BLANK));
 }
 
-export function checkWin(player1Color: string, board: string[][]): CheckWin {
+export function checkEverything(player1Color: string, board: string[][]): Status {
+    const isFullBoard = isFullGameBoard(board);
+    const checkWinObject: CheckWin = checkStatus(player1Color, board);
+    const isGameOver = isFullBoard || checkWinObject.hasWon;
+
+    let winner = DRAW;
+    if (checkWinObject.hasWon) {
+        winner = checkWinObject.winningPlayer;
+    }
+
+    return {
+        hasWon: checkWinObject.hasWon,
+        winningCells: checkWinObject.winningCells,
+        winner,
+        isGameOver
+    };
+}
+
+function checkStatus(player1Color: string, board: string[][]): CheckWin {
      const determinePlayer = (cell: string, playerColor: string) => {
         return cell == playerColor ? PLAYER1 : PLAYER2
     }
