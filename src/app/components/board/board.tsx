@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BLANK, createEmptyBoard, EASY, HARD, HUMAN, ITERATIVE, MEDIUM, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
+import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
