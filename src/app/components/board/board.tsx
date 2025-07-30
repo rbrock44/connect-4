@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { BLANK, createEmptyBoard, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
+import { useEffect, useState } from "react";
+import { BLANK, createEmptyBoard, EASY, HARD, HUMAN, ITERATIVE, MEDIUM, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
@@ -18,6 +18,28 @@ const Board = () => {
     const [processingClick, setProcessingClick] = useState<boolean>(false);
 
     // const [hoveredColumn, setHoveredColumn] = useState(null);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const player2Param = urlParams.get('player2');
+        const colorParam = urlParams.get('color');
+        if (player2Param) {
+            if (
+                player2Param === HUMAN ||
+                player2Param === MEDIUM ||
+                player2Param === HARD ||
+                player2Param === ITERATIVE
+            ) {
+                setPlayer2Type(player2Param);
+            }
+        }
+
+        if (colorParam) {
+            if (colorParam === RED) {
+                setPlayer1Color(RED);
+            }
+        }
+    }, []);
 
     const handlePieceClick = (col: number) => {
         setProcessingClick(true);
@@ -50,7 +72,7 @@ const Board = () => {
                 if (shouldMakeNextMove(player2Type)) {
                     const dummyBoard = newBoard.map(row => [...row]);
                     const move = getAIMove(player2Type as AI_TYPE, player1Color, player2Color, dummyBoard);
-                    
+
                     newBoard[move[0]][move[1]] = player2Color;
                     console.log('AI MOVE: ', move[0], move[1])
 
@@ -80,8 +102,7 @@ const Board = () => {
     const handleColorClick = (player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR) => {
         setPlayer1Color(player1Color);
         setPlayer2Color(player2Color);
-
-        // TODO: add player 1 color to url when not YELLOW, remove from url when YELLOW
+        handleUrlParam('color', player1Color, player1Color === YELLOW);
     };
 
     const handleRestart = () => {
@@ -107,8 +128,7 @@ const Board = () => {
 
     function handlePlayer2Change(val: PLAYER_TYPE): void {
         setPlayer2Type(val);
-
-        // TODO: add player 2 to url when not HUMAN, remove from url when HUMAN
+        handleUrlParam('player2', val, val === HUMAN);
     }
 
     function nextMoveMessage(): string {
@@ -116,6 +136,17 @@ const Board = () => {
             return '';
         }
         return firstPlayerTurn ? `Player 1's Turn` : (isPlayer2Human(player2Type) ? `Player 2's Turn` : '');
+    }
+
+    function handleUrlParam(param: string, value: string, shouldDelete: boolean): void {
+        const url = new URL(window.location.href);
+        
+        if (shouldDelete) {
+            url.searchParams.delete(param);
+        } else {
+            url.searchParams.set(param, value);
+        }
+        window.history.replaceState({}, '', url);
     }
 
     return (
@@ -126,7 +157,7 @@ const Board = () => {
 
             <div className="relative">
                 <div
-                    className={`flex flex-col p-2 mb-2 gap-2 ${gameStarted ? 'border border-red-400 rounded' : ''
+                    className={`flex flex-col p-2 mt-2 mb-2 gap-2 ${gameStarted ? 'border border-red-400 rounded' : ''
                         }`}
                 >
                     {gameStarted && (
@@ -186,7 +217,7 @@ const Board = () => {
                     <p className="text-xs mt-1 mb-2 opacity-75 h-4">
                         {nextMoveMessage()}
                     </p>
-                </div>  
+                </div>
 
                 <div className="relative">
                     <div
@@ -234,7 +265,7 @@ const Board = () => {
                 />
             </div>
 
-            
+
         </div>
     );
 };
