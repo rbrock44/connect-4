@@ -19,7 +19,7 @@ export class AIHard extends Connect4AI {
             return blockingMove;
         }
     
-        const strategicMove = this.findStrategicMove(validMoves, board, 1.0);
+        const strategicMove = this.findStrategicMove(validMoves, 1.0);
         if (strategicMove[0] !== -1) {
             return strategicMove;
         }

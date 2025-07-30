@@ -1,4 +1,4 @@
-import { BLANK, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { BLANK, COLUMNS, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
 import { isGameOver } from "../services/game.service";
 
 export abstract class Connect4AI {
@@ -51,8 +51,8 @@ export abstract class Connect4AI {
         return blanks;
     }
 
-    protected findStrategicMove(validMoves: number[][], board: COLOR[][], chance: number = 0.6): number[] {
-        const centerCol = 3;
+    protected findStrategicMove(validMoves: number[][], chance: number = 0.6): number[] {
+        const centerCol = Math.floor(COLUMNS / 2);
         
         const centerMoves = validMoves.filter(([_, col]) => 
             Math.abs(col - centerCol) <= 1

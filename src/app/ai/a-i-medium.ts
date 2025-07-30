@@ -21,7 +21,7 @@ export class AIMedium extends Connect4AI {
             }
         }
         
-        const strategicMove = this.findStrategicMove(validMoves, board);
+        const strategicMove = this.findStrategicMove(validMoves);
         if (strategicMove[0] !== -1) {
             return strategicMove;
         }
