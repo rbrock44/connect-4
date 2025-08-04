@@ -3,56 +3,77 @@
 [Live Website](https://connect-4.ryan-brock.com/)
 This react application was created to play connect four against another human or various AI difficulties
 
+# Connect 4
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> This project helps compare achievements on different platforms [WIP] <br/>
+> [Live - Connect 4 Website](https://connect-4.ryan-brock.com/)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📚 Table of Contents
 
-## Expanding the ESLint configuration
+- [What's My Purpose?](#-whats-my-purpose)
+- [How to Use](#-how-to-use)
+- [Technologies](#-technologies)
+- [Getting Started (Local Setup)](#-getting-started-local-setup)
+  - [Run Locally](#run-locally)
+  - [GitHub Hooks](#github-hooks)
+  - [Build](#build)
+  - [Deploy](#deploy)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🧠 What's My Purpose?
+
+This is a server side single-page react frontend created to play Connect 4 against another human or various AI difficulties [WIP]. I've enjoyed Connect 4 since high school, where a particular teacher (and football coach) was very good and I had to rise to the occasion as competition. I created this application in the Summer of 2025 when I was unemployed (laid off).  
+
+---
+
+## 🚦 How to Use
+
+- `Select Color` - Yellow is selected by default
+- `Select Player 2`
+  - Human
+  - AI - Easy -> 20% chance to block threat (win), 80% random (of available moves)
+  - AI - Medium -> First look for winning move. Then 80% chance to block threat (win). Last is to find a strategic move and if that doesn't work the fallback is a random move
+  - AI - Hard -> First look for winning move. Then block all threats (wins). Find safe moves (that don't give Player 1 a chance to win). Find harder strategic moves from that set and if all fail, fallback to a random move
+  - AI - Iterative -> This version learns as you play. It will be harder and harder to win the more games playes
+
+<br/><br/>
+Other Actions
+  - `Clear Board` - Can only be done after a game is started and is used to reset or restart a Connect 4 game
+---
+
+## 🛠 Technologies
+
+- Framework: `React 19`
+- Styles: `Tailwind CSS`
+- Deployment: `GitHub Pages`
+
+---
+
+## 🚀 Getting Started (Local Setup)
+
+* Install [node](https://nodejs.org/en) - v19 is needed (v22 also works)
+* Clone [repo](https://github.com/rbrock44/connect-4)
+
+### Run Locally
+
+```
+npm install
+npm start
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Github Hooks
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Build
+    - Trigger: On Push to Main
+    - Action(s): Builds application then kicks off gh page action to deploy build output
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### Build
+
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+### Deploy
+
+Run `npm run prod` to build and deploy the project. Make sure to be on `master` and that it is up to date before running the command. It's really meant to be a CI/CD action
