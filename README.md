@@ -53,12 +53,15 @@ Other Actions
 * Install [node](https://nodejs.org/en) - v19 is needed (v22 also works)
 * Clone [repo](https://github.com/rbrock44/connect-4)
 
+---
+
 ### Run Locally
 
 ```
 npm install
 npm start
 ```
+---
 
 ### Github Hooks
 
@@ -66,10 +69,16 @@ npm start
     - Trigger: On Push to Main
     - Action(s): Builds application then kicks off gh page action to deploy build output
 
+---
+
 ### Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+---
+
 ### Deploy
 
 Run `npm run prod` to build and deploy the project. Make sure to be on `master` and that it is up to date before running the command. It's really meant to be a CI/CD action
+
+---
