@@ -1,11 +1,7 @@
-# Connect 4 (React + TypeScript + Vite)
-
-[Live Website](https://connect-4.ryan-brock.com/)
-This react application was created to play connect four against another human or various AI difficulties
-
 # Connect 4
+(React + TypeScript + Vite) <br/> <br/>
 
-> This project helps compare achievements on different platforms [WIP] <br/>
+> This project  was created to play connect four against another human or various AI difficulties [WIP] <br/>
 > [Live - Connect 4 Website](https://connect-4.ryan-brock.com/)
 
 ---
