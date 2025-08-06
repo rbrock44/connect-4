@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, startGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE, endGame } from "../../constants";
-import type { Game, Status } from "../../objects";
+import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, startGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE, endGame, PLAYER1 } from "../../constants";
+import type { Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
@@ -69,7 +69,12 @@ const Board = () => {
             // TODO: shake/wiggle or other notification action that move is invalid
         } else {
             newBoard[foundIndex][col] = color;
-            console.log('PLAYER 1 MOVE: ', foundIndex, col)
+            const playerMove: Move = {
+                column: col,
+                playerMoveType: firstPlayerTurn ? PLAYER1 : PLAYER2
+            }
+            game.moves.push(playerMove);
+            console.log(firstPlayerTurn ? PLAYER1 : PLAYER2 + ' MOVE: ', foundIndex, col)
 
             //check to see if anybody won or there's a draw, else next move please
             const status: Status = checkEverything(player1Color, newBoard);
@@ -82,6 +87,12 @@ const Board = () => {
 
                     newBoard[move[0]][move[1]] = player2Color;
                     console.log('AI MOVE: ', move[0], move[1])
+
+                    const aiMove: Move = {
+                        column: col,
+                        playerMoveType: 'ai'
+                    }
+                    game.moves.push(aiMove);
 
                     const newStatus: Status = checkEverything(player1Color, newBoard);
                     if (newStatus.isGameOver) {
