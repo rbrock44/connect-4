@@ -70,7 +70,7 @@ export class AIHard extends Connect4AI {
         return [-1, -1];
     }
 
-    private createsWinningThreatNextTurn(board: COLOR[][], row: number, col: number): boolean {
+    private createsWinningThreatNextTurn(board: COLOR[][]): boolean {
         // Check if opponent can win on their NEXT turn after this move
         const opponentMoves = this.getValidMoves(board);
         
