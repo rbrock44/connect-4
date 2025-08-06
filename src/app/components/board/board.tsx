@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, newGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
+import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, startGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE, endGame } from "../../constants";
 import type { Game, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
@@ -16,7 +16,7 @@ const Board = () => {
     const [winner, setWinner] = useState<string>('');
     const [winningCells, setWinningCells] = useState<number[][]>([]);
     const [processingClick, setProcessingClick] = useState<boolean>(false);
-    const [game, setGame] = useState<Game>(newGame(player1Color, player2Color, player2Type));
+    const [game, setGame] = useState<Game>(startGame(player1Color, player2Color, player2Type));
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
 
     // const [hoveredColumn, setHoveredColumn] = useState(null);
@@ -48,7 +48,7 @@ const Board = () => {
         setProcessingClick(true);
         // is first move?
         if (!gameStarted) {
-            setGame(newGame(player1Color, player2Color, player2Type))
+            setGame(startGame(player1Color, player2Color, player2Type))
             setGameStarted(true);
         }
         let newBoard = board.map(row => [...row]);
@@ -104,6 +104,8 @@ const Board = () => {
         setGameOver(true);
         setWinningCells(status.winningCells);
         setWinner(status.winner);
+
+        setGame(endGame(game, status.winningCells, status.winner))
     };
 
     const handleColorClick = (player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR) => {

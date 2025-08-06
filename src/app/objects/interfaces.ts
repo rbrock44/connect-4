@@ -25,4 +25,6 @@ export interface Game {
     player1Color: PLAYER_COLOR;
     player2Color: PLAYER_COLOR;
     player2Type: PLAYER_TYPE;
+    startTime: string;
+    endTime: string;
 }

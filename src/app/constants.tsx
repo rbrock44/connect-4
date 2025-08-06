@@ -7,14 +7,16 @@ export const createEmptyBoard = () => {
     return Array(ROWS).fill(0).map(() => Array(COLUMNS).fill(BLANK));
 };
 
-export function newGame(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR, player2Type: PLAYER_TYPE): Game {
+export function startGame(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR, player2Type: PLAYER_TYPE): Game {
     return {
         moves: [],
         winningCells: [],
         winner: '',
         player1Color: player1Color,
         player2Color: player2Color,
-        player2Type: player2Type
+        player2Type: player2Type,
+        startTime: getNow(),
+        endTime: '',
     };
 };
 
@@ -25,7 +27,9 @@ export function endGame(game: Game, winningCells: number[][], winner: string): G
         winner: winner,
         player1Color: game.player1Color,
         player2Color: game.player2Color,
-        player2Type: game.player2Type
+        player2Type: game.player2Type,
+        startTime: game.startTime,
+        endTime: getNow(),
     };
 };
 
@@ -49,3 +53,17 @@ export const DRAW = 'draw';
 export type PLAYER = 'player1' | 'player2' | 'draw'
 
 export type PLAYER_MOVE_TYPE = 'player1' | 'player2' | 'ai'
+
+function getNow(): string {
+    const now = new Date();
+
+    // Format to: YYYY-MM-DD HH:MM (no seconds)
+    const dateTimeString = now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0') + ' ' +
+    String(now.getHours()).padStart(2, '0') + ':' +
+    String(now.getMinutes()).padStart(2, '0');
+
+  return dateTimeString;
+}
+
