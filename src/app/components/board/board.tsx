@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
-import type { Status } from "../../objects";
+import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, newGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
+import type { Game, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
@@ -16,12 +16,14 @@ const Board = () => {
     const [winner, setWinner] = useState<string>('');
     const [winningCells, setWinningCells] = useState<number[][]>([]);
     const [processingClick, setProcessingClick] = useState<boolean>(false);
+    const [game, setGame] = useState<Game>(newGame(player1Color, player2Color, player2Type));
+    const [gameHistory, setGameHistory] = useState<Game[]>([]);
 
     // const [hoveredColumn, setHoveredColumn] = useState(null);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
-        const player2Param = urlParams.get('player2');
+        const player2Param = urlParams.get(PLAYER2);
         const colorParam = urlParams.get('color');
         if (player2Param) {
             if (
@@ -37,14 +39,19 @@ const Board = () => {
         if (colorParam) {
             if (colorParam === RED) {
                 setPlayer1Color(RED);
+                setPlayer2Color(YELLOW);
             }
         }
     }, []);
 
     const handlePieceClick = (col: number) => {
         setProcessingClick(true);
+        // is first move?
+        if (!gameStarted) {
+            setGame(newGame(player1Color, player2Color, player2Type))
+            setGameStarted(true);
+        }
         let newBoard = board.map(row => [...row]);
-        setGameStarted(true);
 
         const color = getColorForMove(player1Color, player2Color, firstPlayerTurn);
 
@@ -107,7 +114,8 @@ const Board = () => {
 
     const handleRestart = () => {
         if (gameOver && isIterativeAI(player2Type)) {
-            // TODO: save board off for iterative AI
+            gameHistory.push(game)
+            setGameHistory(gameHistory)
         }
         setBoard(createEmptyBoard);
         setGameStarted(false);
@@ -118,7 +126,7 @@ const Board = () => {
     };
 
     const handleRestartWarning = () => {
-        // TODO: create popup or something to confirms user wants to clear board (this cannot be reversed)
+        // TODO: create popup or something to confirm user wants to clear board (this cannot be reversed)
         handleRestart();
     };
 
@@ -128,7 +136,7 @@ const Board = () => {
 
     function handlePlayer2Change(val: PLAYER_TYPE): void {
         setPlayer2Type(val);
-        handleUrlParam('player2', val, val === HUMAN);
+        handleUrlParam(PLAYER2, val, val === HUMAN);
     }
 
     function nextMoveMessage(): string {
