@@ -51,7 +51,8 @@ export class AIHard extends Connect4AI {
             }
             
             // Check if opponent creates a winning threat for next turn
-            if (this.createsWinningThreatNextTurn(testBoard, row, column)) {
+            // if (this.createsWinningThreatNextTurn(testBoard, row, column)) {
+            if (this.createsWinningThreatNextTurn(testBoard)) {
                 criticalMoves.push([row, column]);
             }
         }
