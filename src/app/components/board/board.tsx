@@ -116,7 +116,7 @@ const Board = () => {
         setWinningCells(status.winningCells);
         setWinner(status.winner);
 
-        setGame(endGame(game, status.winningCells, status.winner))
+        setGame(endGame(game, board, status.winningCells, status.winner))
     };
 
     const handleColorClick = (player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR) => {

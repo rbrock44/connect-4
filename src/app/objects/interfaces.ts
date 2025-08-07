@@ -1,4 +1,4 @@
-import type { PLAYER_COLOR, PLAYER_MOVE_TYPE, PLAYER_TYPE } from "../constants";
+import type { COLOR, PLAYER_COLOR, PLAYER_MOVE_TYPE, PLAYER_TYPE } from "../constants";
 
 export interface Status {
     hasWon: boolean;
@@ -20,6 +20,7 @@ export interface Move {
 
 export interface Game {
     moves: Move[];
+    board: COLOR[][];
     winningCells: number[][];
     winner: string;
     player1Color: PLAYER_COLOR;

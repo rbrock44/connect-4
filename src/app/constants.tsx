@@ -20,9 +20,10 @@ export function startGame(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR
     };
 };
 
-export function endGame(game: Game, winningCells: number[][], winner: string): Game {
+export function endGame(game: Game, board: COLOR[][], winningCells: number[][], winner: string): Game {
     return {
         moves: game.moves,
+        board: board,
         winningCells: winningCells,
         winner: winner,
         player1Color: game.player1Color,
