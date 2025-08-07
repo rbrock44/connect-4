@@ -34,6 +34,7 @@ This is a server side single-page react frontend created to play Connect 4 again
   - AI - Medium -> First look for winning move. Then 80% chance to block threat (win). Last is to find a strategic move and if that doesn't work the fallback is a random move
   - AI - Hard -> First look for winning move. Then block all threats (wins). Find safe moves (that don't give Player 1 a chance to win). Find harder strategic moves from that set and if all fail, fallback to a random move
   - AI - Iterative -> This version learns as you play. It will be harder and harder to win the more games playes
+- `Place Piece` - Select column to lay piece
 
 <br/><br/>
 Other Actions

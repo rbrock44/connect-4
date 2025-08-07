@@ -1,15 +1,13 @@
 import { BLANK, RED, YELLOW } from "../../constants";
 
-const GamePiece = (
-    { 
-        state = BLANK, 
-        onClick = ()=>{}, 
-        isSmall = false,
-        isHoverable = false,
-        isSelected = false,
-        isDisabled = false, 
-    }
-) => {
+const GamePiece = ({
+    state = BLANK,
+    onClick = () => {},
+    isSmall = false,
+    isHoverable = false,
+    isSelected = false,
+    isDisabled = false,
+}) => {
     const getStateClasses = () => {
         switch (state) {
             case YELLOW:
@@ -24,32 +22,36 @@ const GamePiece = (
     const hoverClasses = isHoverable
         ? 'hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 cursor-pointer transition-all duration-200'
         : '';
-
-    const selectedClasses = isSelected
-        ? 'outline outline-4 outline-blue-400'
-        : '';   
     
+    const selectedClasses = isSelected
+        ? 'outline outline-2 sm:outline-4 outline-blue-400'
+        : '';
+
     const disabledClasses = isDisabled
         ? 'opacity-40 cursor-not-allowed pointer-events-none'
-        : ''; 
-    
-    // TODO: this needs to handle mobile, the current setup is two hardcoded sizes, one for the board, the smaller one for the player color choice    
-    const heightClasses = isSmall ? 'w-8 h-8' : 'w-12 h-12'; 
+        : '';
+
+    // Responsive sizing - smaller on mobile, larger on desktop
+    const heightClasses = isSmall 
+        ? 'w-6 h-6 sm:w-8 sm:h-8' // Small pieces (for UI elements)
+        : 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12'; // Game board pieces
 
     return (
         <div
             className={`
-        ${heightClasses}
-        rounded-full border-2 transition-all duration-300
-        ${getStateClasses()}
-        ${hoverClasses}
-        ${selectedClasses}
-        ${disabledClasses}
-        relative overflow-hidden
-      `}
+                ${heightClasses}
+                rounded-full border-2 transition-all duration-300
+                ${getStateClasses()}
+                ${hoverClasses}
+                ${selectedClasses}
+                ${disabledClasses}
+                relative overflow-hidden
+                touch-manipulation
+            `}
             onClick={!isDisabled ? onClick : undefined}
         >
-            <div className="absolute top-1 left-1 w-3 h-3 bg-white/30 rounded-full blur-sm" />
+            {/* Light reflection effect - scale with piece size */}
+            <div className="absolute top-0.5 left-0.5 sm:top-1 sm:left-1 w-2 h-2 sm:w-3 sm:h-3 bg-white/30 rounded-full blur-sm" />
             <div className="absolute inset-0 rounded-full shadow-inner" />
         </div>
     );

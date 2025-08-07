@@ -171,7 +171,7 @@ const Board = () => {
     }
 
     return (
-        <div className="flex flex-col items-center p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
+        <div className="flex flex-col items-center p-1 sm:p-1 md:p-4 lg:p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
             <h1 className="text-4xl font-bold text-white mb-8 text-center">
                 Connect <span className="text-yellow-400">4</span>
             </h1>
@@ -242,8 +242,17 @@ const Board = () => {
 
                 <div className="relative">
                     <div
-                        className={`bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-6 rounded-2xl shadow-2xl border-4 border-blue-500 ${gameOver ? 'pointer-events-none opacity-50' : ''
-                            }`}
+                        className={`
+                            bg-gradient-to-br 
+                            from-blue-600 via-blue-700 
+                            to-blue-800 
+                            sm:p-4 md:p-6 
+                            rounded-2xl sm:rounded-2xl
+                            shadow-2xl 
+                            border-4 
+                            border-blue-500 
+                            ${gameOver ? 'pointer-events-none opacity-50' : ''}
+                            `}
                         style={{
                             boxShadow:
                                 '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)'
