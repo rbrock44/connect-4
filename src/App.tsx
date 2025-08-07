@@ -3,9 +3,7 @@ import Board from './app/components/board/board';
 
 function App() {
   return (
-    <>
-        <Board></Board>
-    </>
+    <Board></Board>
   )
 }
 
