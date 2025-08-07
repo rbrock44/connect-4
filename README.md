@@ -4,6 +4,11 @@
 > This project  was created to play connect four against another human or various AI difficulties [WIP] <br/>
 > [Live - Connect 4 Website](https://connect-4.ryan-brock.com/)
 
+Screenshots:
+![preview](/screenshots/main.png)
+![game started](/screenshots/game-started.png)
+![game ended](/screenshots/game-ended.png)
+
 ---
 
 ## 📚 Table of Contents
@@ -39,6 +44,12 @@ This is a server side single-page react frontend created to play Connect 4 again
 <br/><br/>
 Other Actions
   - `Clear Board` - Can only be done after a game is started and is used to reset or restart a Connect 4 game
+
+Screenshots:
+![preview](/screenshots/main.png)
+![game started](/screenshots/game-started.png)
+![game ended](/screenshots/game-ended.png)
+
 ---
 
 ## 🛠 Technologies
