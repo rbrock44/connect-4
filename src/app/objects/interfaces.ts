@@ -18,14 +18,20 @@ export interface Move {
     playerMoveType: PLAYER_MOVE_TYPE;
 }
 
-export interface Game {
+export interface ActiveGame {
     moves: Move[];
-    board: COLOR[][];
-    winningCells: number[][];
-    winner: string;
     player1Color: PLAYER_COLOR;
     player2Color: PLAYER_COLOR;
     player2Type: PLAYER_TYPE;
     startTime: string;
+}
+
+export interface EndedGame {
+    board: COLOR[][];
+    winningCells: number[][];
+    winner: string;
+}
+
+export interface Game extends ActiveGame, EndedGame {
     endTime: string;
 }

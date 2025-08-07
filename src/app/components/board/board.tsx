@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, startGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE, endGame, PLAYER1 } from "../../constants";
-import type { Game, Move, Status } from "../../objects";
+import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
@@ -16,7 +16,7 @@ const Board = () => {
     const [winner, setWinner] = useState<string>('');
     const [winningCells, setWinningCells] = useState<number[][]>([]);
     const [processingClick, setProcessingClick] = useState<boolean>(false);
-    const [game, setGame] = useState<Game>(startGame(player1Color, player2Color, player2Type));
+    const [activeGame, setActiveGame] = useState<ActiveGame>(startGame(player1Color, player2Color, player2Type));
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
 
     // const [hoveredColumn, setHoveredColumn] = useState(null);
@@ -48,7 +48,7 @@ const Board = () => {
         setProcessingClick(true);
         // is first move?
         if (!gameStarted) {
-            setGame(startGame(player1Color, player2Color, player2Type))
+            setActiveGame(startGame(player1Color, player2Color, player2Type))
             setGameStarted(true);
         }
         let newBoard = board.map(row => [...row]);
@@ -73,7 +73,7 @@ const Board = () => {
                 column: col,
                 playerMoveType: firstPlayerTurn ? PLAYER1 : PLAYER2
             }
-            game.moves.push(playerMove);
+            activeGame.moves.push(playerMove);
             console.log(firstPlayerTurn ? PLAYER1 : PLAYER2 + ' MOVE: ', foundIndex, col)
 
             //check to see if anybody won or there's a draw, else next move please
@@ -92,7 +92,7 @@ const Board = () => {
                         column: col,
                         playerMoveType: 'ai'
                     }
-                    game.moves.push(aiMove);
+                    activeGame.moves.push(aiMove);
 
                     const newStatus: Status = checkEverything(player1Color, newBoard);
                     if (newStatus.isGameOver) {
@@ -115,8 +115,16 @@ const Board = () => {
         setGameOver(true);
         setWinningCells(status.winningCells);
         setWinner(status.winner);
-
-        setGame(endGame(game, board, status.winningCells, status.winner))
+        
+        if (gameOver && isIterativeAI(player2Type)) {
+            const endedGame: EndedGame = {
+                board: board,
+                winningCells: status.winningCells,
+                winner: status.winner
+            }
+            gameHistory.push(endGame(activeGame, endedGame))
+            setGameHistory(gameHistory)
+        }
     };
 
     const handleColorClick = (player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR) => {
@@ -126,10 +134,6 @@ const Board = () => {
     };
 
     const handleRestart = () => {
-        if (gameOver && isIterativeAI(player2Type)) {
-            gameHistory.push(game)
-            setGameHistory(gameHistory)
-        }
         setBoard(createEmptyBoard);
         setGameStarted(false);
         setGameOver(false);

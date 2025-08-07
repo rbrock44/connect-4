@@ -6,5 +6,7 @@ export {
     type Status, 
     type CheckWin,
     type Move,
-    type Game 
+    type ActiveGame, 
+    type EndedGame, 
+    type Game,
 } from './interfaces';

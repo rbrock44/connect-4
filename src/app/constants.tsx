@@ -1,4 +1,4 @@
-import type { Game } from "./objects";
+import type { ActiveGame, EndedGame, Game } from "./objects";
 
 export const ROWS = 6;
 export const COLUMNS = 7;
@@ -7,29 +7,28 @@ export const createEmptyBoard = () => {
     return Array(ROWS).fill(0).map(() => Array(COLUMNS).fill(BLANK));
 };
 
-export function startGame(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR, player2Type: PLAYER_TYPE): Game {
+export function startGame(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR, player2Type: PLAYER_TYPE): ActiveGame {
     return {
         moves: [],
-        winningCells: [],
-        winner: '',
         player1Color: player1Color,
         player2Color: player2Color,
         player2Type: player2Type,
         startTime: getNow(),
-        endTime: '',
     };
 };
 
-export function endGame(game: Game, board: COLOR[][], winningCells: number[][], winner: string): Game {
+export function endGame(activeGame: ActiveGame, endedGame: EndedGame): Game {
     return {
-        moves: game.moves,
-        board: board,
-        winningCells: winningCells,
-        winner: winner,
-        player1Color: game.player1Color,
-        player2Color: game.player2Color,
-        player2Type: game.player2Type,
-        startTime: game.startTime,
+        moves: activeGame.moves,
+        player1Color: activeGame.player1Color,
+        player2Color: activeGame.player2Color,
+        player2Type: activeGame.player2Type,
+        startTime: activeGame.startTime,
+
+        board: endedGame.board,
+        winner: endedGame.winner,
+        winningCells: endedGame.winningCells,
+
         endTime: getNow(),
     };
 };
