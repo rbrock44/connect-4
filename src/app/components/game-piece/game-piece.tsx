@@ -31,10 +31,9 @@ const GamePiece = ({
         ? 'opacity-40 cursor-not-allowed pointer-events-none'
         : '';
 
-    // Responsive sizing - smaller on mobile, larger on desktop
     const heightClasses = isSmall 
-        ? 'w-6 h-6 sm:w-8 sm:h-8' // Small pieces (for UI elements)
-        : 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12'; // Game board pieces
+        ? 'w-6 h-6 sm:w-8 sm:h-8'
+        : 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12'; 
 
     return (
         <div
@@ -50,7 +49,6 @@ const GamePiece = ({
             `}
             onClick={!isDisabled ? onClick : undefined}
         >
-            {/* Light reflection effect - scale with piece size */}
             <div className="absolute top-0.5 left-0.5 sm:top-1 sm:left-1 w-2 h-2 sm:w-3 sm:h-3 bg-white/30 rounded-full blur-sm" />
             <div className="absolute inset-0 rounded-full shadow-inner" />
         </div>

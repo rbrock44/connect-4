@@ -6,6 +6,7 @@ export class AIHard extends Connect4AI {
         super(color, player1color);
     }
 
+    // TODO: test for several gotcha scenarios, be happy with result if they all pass
     getMove(board: COLOR[][]): number[] {
         const validMoves: number[][] = this.getValidMoves(board);
        

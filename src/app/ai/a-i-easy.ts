@@ -9,8 +9,8 @@ export class AIEasy extends Connect4AI {
     getMove(board: COLOR[][]): number[] {
         const validMoves: number[][] = this.getValidMoves(board);
 
-        // 20% chance to look for threats, 80% random
-        if (Math.random() < 0.2) {
+        // 40% chance to look for threats, 60% random
+        if (Math.random() < 0.4) {
             const blockingMove: number[] = this.findImmediateThreat(validMoves, board);
             if (blockingMove[0] !== -1) {
                 return blockingMove;

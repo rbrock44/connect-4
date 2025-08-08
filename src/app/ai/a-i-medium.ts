@@ -14,7 +14,7 @@ export class AIMedium extends Connect4AI {
             return winningMove;
         }
         
-        if (Math.random() < 0.8) {
+        if (Math.random() < 0.85) {
             const blockingMove = this.findImmediateThreat(validMoves, board);
             if (blockingMove[0] !== -1) {
                 return blockingMove;

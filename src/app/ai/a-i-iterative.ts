@@ -6,11 +6,10 @@ export class AIIterative extends Connect4AI {
         super(color, player1color);
     }
 
+    // TODO: create iterative difficulty, currently copied from EASY
     getMove(board: COLOR[][]): number[] {
-        //TODO: upgrade AI from easu
         const validMoves: number[][] = this.getValidMoves(board);
 
-        // 20% chance to look for threats, 80% random
         if (Math.random() < 0.2) {
             const blockingMove: number[] = this.findImmediateThreat(validMoves, board);
             if (blockingMove[0] !== -1) {
