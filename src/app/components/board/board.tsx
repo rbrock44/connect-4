@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BLANK, createEmptyBoard, HARD, HUMAN, ITERATIVE, MEDIUM, startGame, PLAYER2, RED, ROWS, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE, endGame, PLAYER1 } from "../../constants";
+import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
@@ -55,14 +55,7 @@ const Board = () => {
 
         const color = getColorForMove(player1Color, player2Color, firstPlayerTurn);
 
-        //determine which row of the column for the piece to be played
-        let foundIndex = ROWS;
-        for (let i = ROWS - 1; i >= 0; i--) {
-            if (newBoard[i][col] === BLANK) {
-                foundIndex = i;
-                break;
-            }
-        }
+        let foundIndex = findRowToPlacePiece(board, col);
 
         if (foundIndex === ROWS) {
             // row is full -- invalid move

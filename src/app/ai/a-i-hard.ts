@@ -1,4 +1,4 @@
-import { BLANK, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { BLANK, random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
 import { Connect4AI } from "./connect4-a-i";
 
 export class AIHard extends Connect4AI {
@@ -34,7 +34,7 @@ export class AIHard extends Connect4AI {
             return strategicMove;
         }
        
-        const randomIndex = Math.floor(Math.random() * validMoves.length);
+        const randomIndex = Math.floor(random() * validMoves.length);
         return validMoves[randomIndex];
     }
 

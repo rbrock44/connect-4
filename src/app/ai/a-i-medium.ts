@@ -1,4 +1,4 @@
-import { RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
 import { Connect4AI } from "./connect4-a-i";
 
 export class AIMedium extends Connect4AI {
@@ -14,7 +14,7 @@ export class AIMedium extends Connect4AI {
             return winningMove;
         }
         
-        if (Math.random() < 0.85) {
+        if (random() < 0.85) {
             const blockingMove = this.findImmediateThreat(validMoves, board);
             if (blockingMove[0] !== -1) {
                 return blockingMove;
@@ -26,7 +26,7 @@ export class AIMedium extends Connect4AI {
             return strategicMove;
         }
         
-        const randomIndex = Math.floor(Math.random() * validMoves.length);
+        const randomIndex = Math.floor(random() * validMoves.length);
         return validMoves[randomIndex];
     }
 }

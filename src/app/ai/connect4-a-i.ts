@@ -1,4 +1,4 @@
-import { BLANK, COLUMNS, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { BLANK, COLUMNS, random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
 import { isGameOver } from "../services/game.service";
 
 export abstract class Connect4AI {
@@ -58,8 +58,8 @@ export abstract class Connect4AI {
             Math.abs(col - centerCol) <= 1
         );
         
-        if (centerMoves.length > 0 && Math.random() <= chance) {
-            return centerMoves[Math.floor(Math.random() * centerMoves.length)];
+        if (centerMoves.length > 0 && random() <= chance) {
+            return centerMoves[Math.floor(random() * centerMoves.length)];
         }
         
         return [-1, -1];

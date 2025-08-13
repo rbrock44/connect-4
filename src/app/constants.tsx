@@ -33,6 +33,10 @@ export function endGame(activeGame: ActiveGame, endedGame: EndedGame): Game {
     };
 };
 
+export function random(): number {
+    return Math.random();
+}
+
 export const BLANK = 'blank';
 export const RED = 'red';
 export const YELLOW = 'yellow';
@@ -59,11 +63,21 @@ function getNow(): string {
 
     // Format to: YYYY-MM-DD HH:MM (no seconds)
     const dateTimeString = now.getFullYear() + '-' +
-    String(now.getMonth() + 1).padStart(2, '0') + '-' +
-    String(now.getDate()).padStart(2, '0') + ' ' +
-    String(now.getHours()).padStart(2, '0') + ':' +
-    String(now.getMinutes()).padStart(2, '0');
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0');
 
-  return dateTimeString;
+    return dateTimeString;
 }
 
+export function findRowToPlacePiece(board: COLOR[][], column: number): number {
+    let foundIndex = ROWS;
+    for (let i = ROWS - 1; i >= 0; i--) {
+        if (board[i][column] === BLANK) {
+            foundIndex = i;
+            break;
+        }
+    }
+    return foundIndex;
+}
