@@ -47,7 +47,6 @@ Array.prototype.debugBoardString = function (this: COLOR[][]): string {
     return output;
 };
 
-
 describe('a-i-hard', () => {
     const ai = new AIHard(RED, YELLOW);
 
@@ -99,7 +98,65 @@ describe('a-i-hard', () => {
         }
     ].forEach(item => {
         it('should always take immediate win', () => {
-            item.board.debugBoard();
+            // item.board.debugBoard();
+            expect(ai.getMove(item.board)).toEqual(item.expected)
+        })
+    });
+
+    [
+        {
+            // three in a row horizontal
+            board: createEmptyBoard().addMoveToBoard(0, YELLOW).addMoveToBoard(1, YELLOW).addMoveToBoard(2, YELLOW),
+            expected: [5, 3],
+        },
+        {
+            // three in a row horizontal
+            board: createEmptyBoard().addMoveToBoard(6, YELLOW).addMoveToBoard(5, YELLOW).addMoveToBoard(4, YELLOW),
+            expected: [5, 3],
+        },
+        {
+            // three in a row vertically stacked on column 0
+            board: createEmptyBoard().addRepeatedMoves(0, YELLOW, 3),
+            expected: [2, 0],
+        },
+        {
+            // three in a row vertically stacked on column 4
+            board: createEmptyBoard().addRepeatedMoves(4, YELLOW, 3),
+            expected: [2, 4],
+        },
+        {
+            // three in a row at an angle
+            board: createEmptyBoard()
+                .addMoveToBoard(0, YELLOW)
+                .addMoveToBoard(1, RED)
+                .addMoveToBoard(1, YELLOW)
+                .addMoveToBoard(2, RED)
+                .addMoveToBoard(2, RED)
+                .addMoveToBoard(2, YELLOW)
+                .addMoveToBoard(3, YELLOW)
+                .addMoveToBoard(3, RED)
+                .addMoveToBoard(3, YELLOW)
+            ,
+            expected: [2, 3],
+        },
+        {
+            // three in a row at an angle downward
+            board: createEmptyBoard()
+                .addMoveToBoard(1, RED)
+                .addMoveToBoard(1, YELLOW)
+                .addMoveToBoard(2, RED)
+                .addMoveToBoard(2, RED)
+                .addMoveToBoard(2, YELLOW)
+                .addMoveToBoard(3, YELLOW)
+                .addMoveToBoard(3, RED)
+                .addMoveToBoard(3, YELLOW)
+                .addMoveToBoard(3, YELLOW)
+            ,
+            expected: [5, 0],
+        }
+    ].forEach(item => {
+        it('should always block opponent if no winning moves for itself', () => {
+            // item.board.debugBoard();
             expect(ai.getMove(item.board)).toEqual(item.expected)
         })
     });
