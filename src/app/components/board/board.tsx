@@ -78,8 +78,8 @@ const Board = () => {
                     const dummyBoard = newBoard.map(row => [...row]);
                     const move = getAIMove(player2Type as AI_TYPE, player1Color, player2Color, dummyBoard);
 
-                    newBoard[move[0]][move[1]] = player2Color;
-                    console.log('AI MOVE: ', move[0], move[1])
+                    newBoard[move.row][move.column] = player2Color;
+                    console.log('AI MOVE: ', move.row, move.column)
 
                     const aiMove: Move = {
                         column: col,
