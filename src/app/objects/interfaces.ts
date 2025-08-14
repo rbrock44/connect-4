@@ -1,5 +1,10 @@
 import type { COLOR, PLAYER_COLOR, PLAYER_MOVE_TYPE, PLAYER_TYPE } from "../constants";
 
+export interface BoardLocation {
+    column: number;
+    row: number;
+}
+
 export interface Status {
     hasWon: boolean;
     isGameOver: boolean;

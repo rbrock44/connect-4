@@ -1,10 +1,18 @@
 import type { ActiveGame, EndedGame, Game } from "./objects";
+import type { BoardLocation } from "./objects/interfaces";
 
 export const ROWS = 6;
 export const COLUMNS = 7;
 
 export const createEmptyBoard = () => {
     return Array(ROWS).fill(0).map(() => Array(COLUMNS).fill(BLANK));
+};
+
+export function createLocation(row: number = -1, column: number = -1): BoardLocation {
+    return {
+        row: row,
+        column: column
+    }
 };
 
 export function startGame(player1Color: PLAYER_COLOR, player2Color: PLAYER_COLOR, player2Type: PLAYER_TYPE): ActiveGame {

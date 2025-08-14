@@ -1,4 +1,5 @@
 import { random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import type { BoardLocation } from "../objects/interfaces";
 import { Connect4AI } from "./connect4-a-i";
 
 export class AIEasy extends Connect4AI {
@@ -6,13 +7,12 @@ export class AIEasy extends Connect4AI {
         super(color, player1color);
     }
 
-    getMove(board: COLOR[][]): number[] {
-        const validMoves: number[][] = this.getValidMoves(board);
+    getMove(board: COLOR[][]): BoardLocation {
+        const validMoves: BoardLocation[] = this.getValidMoves(board);
 
-        // 40% chance to look for threats, 60% random
         if (random() < 0.4) {
-            const blockingMove: number[] = this.findImmediateThreat(validMoves, board);
-            if (blockingMove[0] !== -1) {
+            const blockingMove: BoardLocation = this.findImmediateThreat(validMoves, board);
+            if (blockingMove.row !== -1) {
                 return blockingMove;
             }
         }

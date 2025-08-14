@@ -1,4 +1,5 @@
 import { random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import type { BoardLocation } from "../objects/interfaces";
 import { Connect4AI } from "./connect4-a-i";
 
 export class AIMedium extends Connect4AI {
@@ -6,23 +7,23 @@ export class AIMedium extends Connect4AI {
         super(color, player1color);
     }
 
-    getMove(board: COLOR[][]): number[] {
-        const validMoves: number[][] = this.getValidMoves(board);
+    getMove(board: COLOR[][]): BoardLocation {
+        const validMoves: BoardLocation[] = this.getValidMoves(board);
         
         const winningMove = this.findWinningMove(validMoves, board);
-        if (winningMove[0] !== -1) {
+        if (winningMove.row !== -1) {
             return winningMove;
         }
         
         if (random() < 0.85) {
             const blockingMove = this.findImmediateThreat(validMoves, board);
-            if (blockingMove[0] !== -1) {
+            if (blockingMove.row !== -1) {
                 return blockingMove;
             }
         }
         
         const strategicMove = this.findStrategicMove(validMoves);
-        if (strategicMove[0] !== -1) {
+        if (strategicMove.row !== -1) {
             return strategicMove;
         }
         

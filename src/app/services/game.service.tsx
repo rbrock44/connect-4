@@ -1,8 +1,9 @@
 import { AIEasy, AIHard, AIIterative, AIMedium } from "../ai";
 import { BLANK, COLUMNS, DRAW, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../constants";
 import type { CheckWin, Status } from "../objects";
+import type { BoardLocation } from "../objects/interfaces";
 
-export function getAIMove(type: AI_TYPE, player1Color: PLAYER_COLOR, aiColor: PLAYER_COLOR, board: COLOR[][]): number[] {
+export function getAIMove(type: AI_TYPE, player1Color: PLAYER_COLOR, aiColor: PLAYER_COLOR, board: COLOR[][]): BoardLocation {
     let ai = new AIEasy(aiColor, player1Color);
     if (type === MEDIUM) {
         ai = new AIMedium(aiColor, player1Color);

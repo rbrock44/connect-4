@@ -1,4 +1,5 @@
-import { BLANK, COLUMNS, random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { BLANK, COLUMNS, createLocation, random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import type { BoardLocation } from "../objects/interfaces";
 import { isGameOver } from "../services/game.service";
 
 export abstract class Connect4AI {
@@ -10,39 +11,39 @@ export abstract class Connect4AI {
         this.player1Color = player1color;
     }
 
-    abstract getMove(board: COLOR[][]): number[];
+    abstract getMove(board: COLOR[][]): BoardLocation;
 
-    protected findImmediateThreat(validMoves: number[][], board: COLOR[][]): number[] {
-        for (const [row, column] of validMoves) {
+    protected findImmediateThreat(validMoves: BoardLocation[], board: COLOR[][]): BoardLocation {
+        for (const move of validMoves) {
             const testBoard = board.map(row => [...row]);
-            testBoard[row][column] = this.player1Color;
+            testBoard[move.row][move.column] = this.player1Color;
             if (isGameOver(testBoard)) {
-                return [row, column]
+                return createLocation(move.row, move.column);
             }
         }
-        return [-1, -1];
+        return createLocation();
     }
 
-    protected findWinningMove(validMoves: number[][], board: COLOR[][]): number[] {
-        for (const [row, column] of validMoves) {
+    protected findWinningMove(validMoves: BoardLocation[], board: COLOR[][]): BoardLocation {
+        for (const move of validMoves) {
             const testBoard = board.map(row => [...row]);
-            testBoard[row][column] = this.color;
+             testBoard[move.row][move.column] = this.color;
             if (isGameOver(testBoard)) {
-                return [row, column]
+                return createLocation(move.row, move.column);
             }
         }
-        return [-1, -1];
+        return createLocation();
     }
 
-    protected getValidMoves(board: COLOR[][]): number[][] {
-        let blanks: number[][] = [];
+    protected getValidMoves(board: COLOR[][]): BoardLocation[] {
+        let blanks: BoardLocation[] = [];
         const numRows = board.length;
         const numCols = board[0].length;
 
         for (let col = 0; col < numCols; col++) {
             for (let row = numRows - 1; row >= 0; row--) {
                 if (board[row][col] === BLANK) {
-                    blanks.push([row, col]);
+                    blanks.push(createLocation(row, col));
                     break;
                 }
             }
@@ -51,17 +52,17 @@ export abstract class Connect4AI {
         return blanks;
     }
 
-    protected findStrategicMove(validMoves: number[][], chance: number = 0.6): number[] {
+    protected findStrategicMove(validMoves: BoardLocation[], chance: number = 0.6): BoardLocation {
         const centerCol = Math.floor(COLUMNS / 2);
         
-        const centerMoves = validMoves.filter(([_, col]) => 
-            Math.abs(col - centerCol) <= 1
+        const centerMoves = validMoves.filter(move => 
+            Math.abs(move.column - centerCol) <= 1
         );
         
         if (centerMoves.length > 0 && random() <= chance) {
             return centerMoves[Math.floor(random() * centerMoves.length)];
         }
         
-        return [-1, -1];
+        return createLocation();
     }
 }
