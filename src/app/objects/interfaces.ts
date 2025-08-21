@@ -18,9 +18,10 @@ export interface CheckWin {
     winningPlayer: string;
 }
 
-export interface Move {
+export interface Move  {
     column: number;
     playerMoveType: PLAYER_MOVE_TYPE;
+    toString(): string;
 }
 
 export interface ActiveGame {

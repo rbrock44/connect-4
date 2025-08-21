@@ -11,7 +11,8 @@ export const createEmptyBoard = () => {
 export function createLocation(row: number = -1, column: number = -1): BoardLocation {
     return {
         row: row,
-        column: column
+        column: column,
+        toString: () => { return `column: `};
     }
 };
 

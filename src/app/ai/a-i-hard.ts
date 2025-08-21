@@ -1,4 +1,4 @@
-import { BLANK, createLocation, random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { BLANK, COLUMNS, createLocation, random, RED, ROWS, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
 import type { BoardLocation } from "../objects/interfaces";
 import { Connect4AI } from "./connect4-a-i";
 
@@ -19,61 +19,179 @@ export class AIHard extends Connect4AI {
 
         const blockingMove = this.findAllThreats(validMoves, board);
         if (blockingMove.row !== -1) {
+            console.log(`Blocking move found - column: ${blockingMove.column} row: ${blockingMove.row}`)
             return blockingMove;
         }
 
         const safeMoves = this.findSafeMoves(validMoves, board);
-   
-        
+
         if (safeMoves.length > 0) {
-            // Among safe moves, pick the best strategic one
-            let bestMove = safeMoves[0];
-            let bestScore = -Infinity;
-            
-            for (const move of safeMoves) {
-                const score = this.evaluateMoveComprehensively(board, move.row, move.column);
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = move;
-                }
-            }
-            
-            return bestMove;
+            return this.selectBestMove(board, safeMoves);
         }
-            
+
         return validMoves[randomIndex];
-        
+
+    }
+
+    public outputSafeMoves(board: COLOR[][]): void {
+        const validMoves: BoardLocation[] = this.getValidMoves(board);
+        const safeMoves = this.findSafeMoves(validMoves, board);
+        for (const move of safeMoves) {
+            console.log(`Column: ${move.column} Row: ${move.row}`)
+        }
+    }
+
+    private selectBestMove(board: COLOR[][], possibleMoves: BoardLocation[]): BoardLocation {
+        let bestMove = possibleMoves[0];
+        let bestScore = -Infinity;
+
+        for (const move of possibleMoves) {
+            const score = this.evaluateMove(board, move);
+            console.log(`Move (${move.column}, ${move.row}): Score ${score}`);
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+        }
+
+        return bestMove;
+    }
+
+    private evaluateMove(board: COLOR[][], move: BoardLocation): number {
+        const tempBoard = board.map(row => [...row]);
+        tempBoard[move.row][move.column] = this.color;
+
+        let score = 0;
+
+        if (this.createsThreat(tempBoard, move)) {
+            score += 200;
+        }
+
+        score += this.getPositionValue(move.column);
+
+        score += this.evaluatePatterns(tempBoard, move);
+
+        return score;
+    }
+
+    private getPositionValue(column: number): number {
+        const centerValue = [10, 20, 30, 40, 30, 20, 10];
+        return centerValue[column] || 0;
+    }
+
+    private createsThreat(board: COLOR[][], move: BoardLocation): boolean {
+        const directions = [
+            [0, 1],   // horizontal
+            [1, 0],   // vertical  
+            [1, 1],   // diagonal /
+            [1, -1]   // diagonal \
+        ];
+
+        for (const [dx, dy] of directions) {
+            if (this.countInDirection(board, move.row, move.column, dx, dy) >= 3) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private countInDirection(board: COLOR[][], row: number, col: number, dx: number, dy: number): number {
+        let count = 1; // Count the current position
+
+        // Count in positive direction
+        let r = row + dx, c = col + dy;
+        while (r >= 0 && r < ROWS && c >= 0 && c < COLUMNS && board[r][c] === this.color) {
+            count++;
+            r += dx;
+            c += dy;
+        }
+
+        // Count in negative direction
+        r = row - dx;
+        c = col - dy;
+        while (r >= 0 && r < ROWS && c >= 0 && c < COLUMNS && board[r][c] === this.color) {
+            count++;
+            r -= dx;
+            c -= dy;
+        }
+
+        return count;
+    }
+
+    private evaluatePatterns(board: COLOR[][], move: BoardLocation): number {
+        let score = 0;
+
+        // Look for patterns like X_X where X is player's piece and _ is empty
+        // This creates multiple winning opportunities
+        const directions = [[0, 1], [1, 1], [1, -1]]; // horizontal, diagonal patterns
+
+        for (const [dx, dy] of directions) {
+            const pattern = this.getPattern(board, move.row, move.column, dx, dy, 4);
+            if (this.isGoodPattern(pattern)) {
+                score += 50;
+            }
+        }
+
+        return score;
+    }
+
+    private getPattern(board: COLOR[][], row: number, col: number, dx: number, dy: number, length: number): COLOR[] {
+        const pattern: COLOR[] = [];
+        const startRow = row - dx * (length - 1);
+        const startCol = col - dy * (length - 1);
+
+        for (let i = 0; i < length; i++) {
+            const r = startRow + i * dx;
+            const c = startCol + i * dy;
+            if (r >= 0 && r < ROWS && c >= 0 && c < COLUMNS) {
+                pattern.push(board[r][c]);
+            } else {
+                pattern.push(BLANK); // Out of bounds
+            }
+        }
+
+        return pattern;
+    }
+
+    private isGoodPattern(pattern: COLOR[]): boolean {
+        const playerCount = pattern.filter(p => p === this.color).length;
+        const emptyCount = pattern.filter(p => p === BLANK).length;
+        const opponentCount = pattern.filter(p => p === this.player1Color).length;
+
+        // Good if we have multiple pieces and no opponent pieces
+        return playerCount >= 2 && opponentCount === 0 && emptyCount > 0;
     }
 
     private findAllThreats(validMoves: BoardLocation[], board: COLOR[][]): BoardLocation {
-        // Find ALL possible threats, not just immediate ones
         const criticalMoves: BoardLocation[] = [];
 
         for (const move of validMoves) {
             const testBoard = board.map(row => [...row]);
             testBoard[move.row][move.column] = this.player1Color;
 
-            // Check if opponent wins immediately
             if (this.checkWin(testBoard, move.row, move.column, this.player1Color)) {
-                return move; // Block immediate win
+                console.log('Check win - column: ' + move.column + ' row: '+ move.row)
+                return move;
             }
 
-            // Check if opponent creates a winning threat for next turn
-            // if (this.createsWinningThreatNextTurn(testBoard, row, column)) {
             if (this.createsWinningThreatNextTurn(testBoard)) {
                 criticalMoves.push(move);
             }
         }
 
-        // If multiple critical moves, choose the one that doesn't set up opponent
-        if (criticalMoves.length > 0) {
+        criticalMoves.sort((a, b) => this.getPositionValue(b.column) - this.getPositionValue(a.column));
+        if (criticalMoves.length > 0 && criticalMoves.length !== 3) {
             for (const move of criticalMoves) {
                 if (!this.setsUpOpponent(board, move.row, move.column)) {
+                     console.log('Critical move found - column: ' + move.column + ' row: '+ move.row);
+                     console.log('Critical moves: ' + criticalMoves);
                     return move;
                 }
             }
-            // If all set up opponent, return first one (better than losing)
             return criticalMoves[0];
+        } else if (criticalMoves.length === 3) {
+            return criticalMoves[1];
         }
 
         return createLocation();

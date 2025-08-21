@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { BLANK, createEmptyBoard, findRowToPlacePiece, RED, YELLOW, type COLOR } from '../constants';
+import { BLANK, createEmptyBoard, createLocation, findRowToPlacePiece, RED, YELLOW, type COLOR } from '../constants';
 import { AIHard } from './index';
+import type { BoardLocation } from '../objects/interfaces';
 
 declare global {
     interface Array<T> {
@@ -54,17 +55,17 @@ describe('a-i-hard', () => {
         {
             // three in a row vertically stacked on column 0
             board: createEmptyBoard().addRepeatedMoves(0, RED, 3),
-            expected: [2, 0],
+            expected: createLocation(2, 0),
         },
         {
             // three in a row vertically stacked on column 4
             board: createEmptyBoard().addRepeatedMoves(4, RED, 3),
-            expected: [2, 4],
+            expected: createLocation(2, 4),
         },
         {
             // three in a row horizontal
             board: createEmptyBoard().addMoveToBoard(0, RED).addMoveToBoard(1, RED).addMoveToBoard(2, RED),
-            expected: [5, 3],
+            expected: createLocation(5, 3),
         },
         {
             // three in a row at an angle
@@ -79,7 +80,7 @@ describe('a-i-hard', () => {
                 .addMoveToBoard(3, YELLOW)
                 .addMoveToBoard(3, RED)
             ,
-            expected: [2, 3],
+            expected: createLocation(2, 3),
         },
         {
             // three in a row at an angle downward
@@ -94,7 +95,7 @@ describe('a-i-hard', () => {
                 .addMoveToBoard(3, RED)
                 .addMoveToBoard(3, RED)
             ,
-            expected: [5, 0],
+            expected: createLocation(5, 0),
         }
     ].forEach(item => {
         it('should always take immediate win', () => {
@@ -104,60 +105,126 @@ describe('a-i-hard', () => {
     });
 
     [
+        // {
+        //     // three in a row horizontal
+        //     board: createEmptyBoard().addMoveToBoard(0, YELLOW).addMoveToBoard(1, YELLOW).addMoveToBoard(2, YELLOW),
+        //     expected: createLocation(5, 3),
+        // },
+        // {
+        //     // three in a row horizontal
+        //     board: createEmptyBoard().addMoveToBoard(6, YELLOW).addMoveToBoard(5, YELLOW).addMoveToBoard(4, YELLOW),
+        //     expected: createLocation(5, 3),
+        // },
+        // {
+        //     // three in a row vertically stacked on column 0
+        //     board: createEmptyBoard().addRepeatedMoves(0, YELLOW, 3),
+        //     expected: createLocation(2, 0),
+        // },
+        // {
+        //     // three in a row vertically stacked on column 4
+        //     board: createEmptyBoard().addRepeatedMoves(4, YELLOW, 3),
+        //     expected: createLocation(2, 4),
+        // },
+        // {
+        //     // three in a row at an angle
+        //     board: createEmptyBoard()
+        //         .addMoveToBoard(0, YELLOW)
+        //         .addMoveToBoard(1, RED)
+        //         .addMoveToBoard(1, YELLOW)
+        //         .addMoveToBoard(2, RED)
+        //         .addMoveToBoard(2, RED)
+        //         .addMoveToBoard(2, YELLOW)
+        //         .addMoveToBoard(3, YELLOW)
+        //         .addMoveToBoard(3, RED)
+        //         .addMoveToBoard(3, YELLOW)
+        //     ,
+        //     expected: createLocation(2, 3),
+        // },
+        // {
+        //     // three in a row at an angle downward
+        //     board: createEmptyBoard()
+        //         .addMoveToBoard(1, RED)
+        //         .addMoveToBoard(1, YELLOW)
+        //         .addMoveToBoard(2, RED)
+        //         .addMoveToBoard(2, RED)
+        //         .addMoveToBoard(2, YELLOW)
+        //         .addMoveToBoard(3, YELLOW)
+        //         .addMoveToBoard(3, RED)
+        //         .addMoveToBoard(3, YELLOW)
+        //         .addMoveToBoard(3, YELLOW)
+        //     ,
+        //     expected: createLocation(5, 0),
+        // },
         {
-            // three in a row horizontal
-            board: createEmptyBoard().addMoveToBoard(0, YELLOW).addMoveToBoard(1, YELLOW).addMoveToBoard(2, YELLOW),
-            expected: [5, 3],
-        },
-        {
-            // three in a row horizontal
-            board: createEmptyBoard().addMoveToBoard(6, YELLOW).addMoveToBoard(5, YELLOW).addMoveToBoard(4, YELLOW),
-            expected: [5, 3],
-        },
-        {
-            // three in a row vertically stacked on column 0
-            board: createEmptyBoard().addRepeatedMoves(0, YELLOW, 3),
-            expected: [2, 0],
-        },
-        {
-            // three in a row vertically stacked on column 4
-            board: createEmptyBoard().addRepeatedMoves(4, YELLOW, 3),
-            expected: [2, 4],
-        },
-        {
-            // three in a row at an angle
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ 🔴 ⚪ ⚪ ⚪
+            // ⚪ 🟡 ⚪ 🟡 ⚪ ⚪ ⚪
             board: createEmptyBoard()
-                .addMoveToBoard(0, YELLOW)
-                .addMoveToBoard(1, RED)
-                .addMoveToBoard(1, YELLOW)
-                .addMoveToBoard(2, RED)
-                .addMoveToBoard(2, RED)
-                .addMoveToBoard(2, YELLOW)
                 .addMoveToBoard(3, YELLOW)
                 .addMoveToBoard(3, RED)
-                .addMoveToBoard(3, YELLOW)
+                .addMoveToBoard(1, YELLOW)
             ,
-            expected: [2, 3],
+            expected: createLocation(5, 2),
         },
         {
-            // three in a row at an angle downward
+            // should block middle when opponent has game ending possibility
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ 🔴 ⚪ ⚪ ⚪
+            // ⚪ ⚪ ⚪ 🟡 ⚪ 🟡 ⚪
             board: createEmptyBoard()
-                .addMoveToBoard(1, RED)
-                .addMoveToBoard(1, YELLOW)
-                .addMoveToBoard(2, RED)
-                .addMoveToBoard(2, RED)
-                .addMoveToBoard(2, YELLOW)
                 .addMoveToBoard(3, YELLOW)
                 .addMoveToBoard(3, RED)
-                .addMoveToBoard(3, YELLOW)
-                .addMoveToBoard(3, YELLOW)
+                .addMoveToBoard(5, YELLOW)
             ,
-            expected: [5, 0],
-        }
+            expected: createLocation(5, 4),
+        },
     ].forEach(item => {
         it('should always block opponent if no winning moves for itself', () => {
-            // item.board.debugBoard();
+            item.board.debugBoard();
             expect(ai.getMove(item.board)).toEqual(item.expected)
         })
     });
+
+    // [
+    //     // {
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ 🔴 ⚪ ⚪ ⚪
+    //     //     // ⚪ 🟡 ⚪ 🟡 ⚪ ⚪ ⚪
+    //     //     board: createEmptyBoard()
+    //     //         .addMoveToBoard(3, YELLOW)
+    //     //         .addMoveToBoard(3, RED)
+    //     //         .addMoveToBoard(1, YELLOW)
+    //     //     ,
+    //     //     expected: createLocation(5, 2),
+    //     // },
+    //     // {
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ ⚪ ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ 🔴 ⚪ ⚪ ⚪
+    //     //     // ⚪ ⚪ ⚪ 🟡 ⚪ 🟡 ⚪
+    //     //     board: createEmptyBoard()
+    //     //         .addMoveToBoard(3, YELLOW)
+    //     //         .addMoveToBoard(3, RED)
+    //     //         .addMoveToBoard(5, YELLOW)
+    //     //     ,
+    //     //     expected: createLocation(5, 4),
+    //     // },
+    // ].forEach(item => {
+    //     it('should make smart moves with whats left', () => {
+    //         item.board.debugBoard();
+    //         // ai.outputSafeMoves(item.board);
+    //         expect(ai.getMove(item.board)).toEqual(item.expected)
+    //     })
+    // });
 });
