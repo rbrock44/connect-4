@@ -12,7 +12,7 @@ export function createLocation(row: number = -1, column: number = -1): BoardLoca
     return {
         row: row,
         column: column,
-        toString: () => { return `column: `};
+        toString: () => { return `column: ${column} row:${row}`}
     }
 };
 

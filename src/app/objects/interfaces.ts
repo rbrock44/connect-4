@@ -3,6 +3,7 @@ import type { COLOR, PLAYER_COLOR, PLAYER_MOVE_TYPE, PLAYER_TYPE } from "../cons
 export interface BoardLocation {
     column: number;
     row: number;
+    toString(): string;
 }
 
 export interface Status {
