@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
-import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
+import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isGameOver, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 import ConfirmationDialog from "../confirmation-dialog/confirmation-dialog";
@@ -21,7 +21,7 @@ const Board = () => {
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
     const [isConfirmationOpen, setConfirmationOpen] = useState<boolean>(false);
 
-    // const [hoveredColumn, setHoveredColumn] = useState(null);
+    const [hoveredColumn, setHoveredColumn] = useState<number | null>(5);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -138,9 +138,11 @@ const Board = () => {
     };
 
     const handleRestartWarning = () => {
-        setConfirmationOpen(true);
-        // TODO: create popup or something to confirm user wants to clear board (this cannot be reversed)
-        // handleRestart();
+        if (gameOver) {
+            handleRestart();
+        } else {
+            setConfirmationOpen(true);
+        }
     };
 
     const isWinningCell = (row: number, col: number): boolean => {
@@ -268,6 +270,9 @@ const Board = () => {
                                             onClick={() => handlePieceClick(colIndex)}
                                             isHoverable={!gameOver}
                                             isDisabled={processingClick}
+                                            isColumnHovered={colIndex === hoveredColumn}
+                                            setColumnHovered={(column: number | null) => setHoveredColumn(column)}
+                                            colIndex={colIndex}
                                         />
                                     </div>
                                 ))
