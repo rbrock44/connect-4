@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BLANK, createEmptyBoard, createLocation, findRowToPlacePiece, RED, YELLOW, type COLOR } from '../constants';
 import { AIHard } from './index';
-import type { BoardLocation } from '../objects/interfaces';
 
 declare global {
     interface Array<T> {
