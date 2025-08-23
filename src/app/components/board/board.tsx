@@ -4,6 +4,7 @@ import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
+import ConfirmationDialog from "../confirmation-dialog/confirmation-dialog";
 
 const Board = () => {
     const [board, setBoard] = useState<COLOR[][]>(createEmptyBoard);
@@ -18,6 +19,7 @@ const Board = () => {
     const [processingClick, setProcessingClick] = useState<boolean>(false);
     const [activeGame, setActiveGame] = useState<ActiveGame>(startGame(player1Color, player2Color, player2Type));
     const [gameHistory, setGameHistory] = useState<Game[]>([]);
+    const [isConfirmationOpen, setConfirmationOpen] = useState<boolean>(false);
 
     // const [hoveredColumn, setHoveredColumn] = useState(null);
 
@@ -136,8 +138,9 @@ const Board = () => {
     };
 
     const handleRestartWarning = () => {
+        setConfirmationOpen(true);
         // TODO: create popup or something to confirm user wants to clear board (this cannot be reversed)
-        handleRestart();
+        // handleRestart();
     };
 
     const isWinningCell = (row: number, col: number): boolean => {
@@ -292,7 +295,11 @@ const Board = () => {
                 />
             </div>
 
-
+            <ConfirmationDialog 
+                isOpen={isConfirmationOpen} 
+                resetGame={() => {handleRestart(); setConfirmationOpen(false);}} 
+                closePopup={() => setConfirmationOpen(false)}            
+                />
         </div>
     );
 };
