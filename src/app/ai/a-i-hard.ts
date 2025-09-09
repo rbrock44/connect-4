@@ -256,223 +256,223 @@ export class AIHard extends Connect4AI {
         return winningOptions > 1; // Multiple winning options = trap
     }
 
-    private evaluateMoveComprehensively(board: COLOR[][], row: number, col: number): number {
-        let score = 0;
-        const testBoard = board.map(row => [...row]);
-        testBoard[row][col] = this.color;
+    // private evaluateMoveComprehensively(board: COLOR[][], row: number, col: number): number {
+    //     let score = 0;
+    //     const testBoard = board.map(row => [...row]);
+    //     testBoard[row][col] = this.color;
 
-        // 1. Check for multiple threats creation
-        score += this.evaluateMultipleThreats(testBoard, row, col) * 100;
+    //     // 1. Check for multiple threats creation
+    //     score += this.evaluateMultipleThreats(testBoard, row, col) * 100;
 
-        // 2. Center preference
-        const numCols = board[0].length;
-        const centerCol = Math.floor(numCols / 2);
-        const distanceFromCenter = Math.abs(col - centerCol);
-        score += (numCols - distanceFromCenter) * 15;
+    //     // 2. Center preference
+    //     const numCols = board[0].length;
+    //     const centerCol = Math.floor(numCols / 2);
+    //     const distanceFromCenter = Math.abs(col - centerCol);
+    //     score += (numCols - distanceFromCenter) * 15;
 
-        // 3. Evaluate potential patterns
-        score += this.evaluateWinningPatterns(testBoard, row, col, this.color) * 25;
+    //     // 3. Evaluate potential patterns
+    //     score += this.evaluateWinningPatterns(testBoard, row, col, this.color) * 25;
 
-        // 4. Avoid giving opponent chances
-        score -= this.evaluateOpponentOpportunities(testBoard, row, col) * 80;
+    //     // 4. Avoid giving opponent chances
+    //     score -= this.evaluateOpponentOpportunities(testBoard, row, col) * 80;
 
-        // 5. Build on existing pieces
-        score += this.evaluateBuildingOnPieces(testBoard, row, col, this.color) * 20;
+    //     // 5. Build on existing pieces
+    //     score += this.evaluateBuildingOnPieces(testBoard, row, col, this.color) * 20;
 
-        // 6. Control key positions
-        score += this.evaluatePositionalAdvantage(testBoard, row, col) * 10;
+    //     // 6. Control key positions
+    //     score += this.evaluatePositionalAdvantage(testBoard, row, col) * 10;
 
-        // 7. Avoid moves that set up opponent
-        score -= this.evaluateSetupRisk(board, row, col) * 30;
+    //     // 7. Avoid moves that set up opponent
+    //     score -= this.evaluateSetupRisk(board, row, col) * 30;
 
-        return score;
-    }
+    //     return score;
+    // }
 
-    private evaluateMultipleThreats(board: COLOR[][], row: number, col: number): number {
-        // Count how many different ways this move creates winning threats
-        let threats = 0;
-        const directions = [[0, 1], [1, 0], [1, 1], [1, -1]]; // horizontal, vertical, diagonal
+    // private evaluateMultipleThreats(board: COLOR[][], row: number, col: number): number {
+    //     // Count how many different ways this move creates winning threats
+    //     let threats = 0;
+    //     const directions = [[0, 1], [1, 0], [1, 1], [1, -1]]; // horizontal, vertical, diagonal
 
-        for (const [dr, dc] of directions) {
-            if (this.createsWinningThreat(board, row, col, dr, dc, this.color)) {
-                threats++;
-            }
-        }
+    //     for (const [dr, dc] of directions) {
+    //         if (this.createsWinningThreat(board, row, col, dr, dc, this.color)) {
+    //             threats++;
+    //         }
+    //     }
 
-        // Multiple threats are exponentially valuable
-        return threats > 1 ? threats * threats : threats;
-    }
+    //     // Multiple threats are exponentially valuable
+    //     return threats > 1 ? threats * threats : threats;
+    // }
 
-    private createsWinningThreat(board: COLOR[][], row: number, col: number, dr: number, dc: number, color: COLOR): boolean {
-        // Check if placing a piece here creates a line of 3 that can become 4
-        let count = 1; // Count the piece we're placing
-        let emptySpaces = 0;
+    // private createsWinningThreat(board: COLOR[][], row: number, col: number, dr: number, dc: number, color: COLOR): boolean {
+    //     // Check if placing a piece here creates a line of 3 that can become 4
+    //     let count = 1; // Count the piece we're placing
+    //     let emptySpaces = 0;
 
-        // Check both directions
-        for (let direction of [-1, 1]) {
-            let r = row + direction * dr;
-            let c = col + direction * dc;
-            let consecutiveCount = 0;
+    //     // Check both directions
+    //     for (let direction of [-1, 1]) {
+    //         let r = row + direction * dr;
+    //         let c = col + direction * dc;
+    //         let consecutiveCount = 0;
 
-            while (r >= 0 && r < board.length && c >= 0 && c < board[0].length && consecutiveCount < 3) {
-                if (board[r][c] === color) {
-                    count++;
-                    consecutiveCount++;
-                } else if (board[r][c] === BLANK) {
-                    emptySpaces++;
-                    break;
-                } else {
-                    break;
-                }
-                r += direction * dr;
-                c += direction * dc;
-            }
-        }
+    //         while (r >= 0 && r < board.length && c >= 0 && c < board[0].length && consecutiveCount < 3) {
+    //             if (board[r][c] === color) {
+    //                 count++;
+    //                 consecutiveCount++;
+    //             } else if (board[r][c] === BLANK) {
+    //                 emptySpaces++;
+    //                 break;
+    //             } else {
+    //                 break;
+    //             }
+    //             r += direction * dr;
+    //             c += direction * dc;
+    //         }
+    //     }
 
-        return count >= 3 && emptySpaces > 0;
-    }
+    //     return count >= 3 && emptySpaces > 0;
+    // }
 
-    private evaluateWinningPatterns(board: COLOR[][], row: number, col: number, color: COLOR): number {
-        let score = 0;
-        const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+    // private evaluateWinningPatterns(board: COLOR[][], row: number, col: number, color: COLOR): number {
+    //     let score = 0;
+    //     const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
 
-        for (const [dr, dc] of directions) {
-            const pattern = this.getPatternScore(board, row, col, dr, dc, color);
-            score += pattern;
-        }
+    //     for (const [dr, dc] of directions) {
+    //         const pattern = this.getPatternScore(board, row, col, dr, dc, color);
+    //         score += pattern;
+    //     }
 
-        return score;
-    }
+    //     return score;
+    // }
 
-    private getPatternScore(board: COLOR[][], row: number, col: number, dr: number, dc: number, color: COLOR): number {
-        let myPieces = 1; // Count the piece we're placing
-        let emptySpaces = 0;
-        let opponentPieces = 0;
+    // private getPatternScore(board: COLOR[][], row: number, col: number, dr: number, dc: number, color: COLOR): number {
+    //     let myPieces = 1; // Count the piece we're placing
+    //     let emptySpaces = 0;
+    //     let opponentPieces = 0;
 
-        // Check 4-piece window in both directions
-        for (let direction of [-1, 1]) {
-            for (let i = 1; i <= 3; i++) {
-                const r = row + direction * i * dr;
-                const c = col + direction * i * dc;
+    //     // Check 4-piece window in both directions
+    //     for (let direction of [-1, 1]) {
+    //         for (let i = 1; i <= 3; i++) {
+    //             const r = row + direction * i * dr;
+    //             const c = col + direction * i * dc;
 
-                if (r < 0 || r >= board.length || c < 0 || c >= board[0].length) {
-                    break;
-                }
+    //             if (r < 0 || r >= board.length || c < 0 || c >= board[0].length) {
+    //                 break;
+    //             }
 
-                if (board[r][c] === color) {
-                    myPieces++;
-                } else if (board[r][c] === BLANK) {
-                    emptySpaces++;
-                } else {
-                    opponentPieces++;
-                    break;
-                }
-            }
-        }
+    //             if (board[r][c] === color) {
+    //                 myPieces++;
+    //             } else if (board[r][c] === BLANK) {
+    //                 emptySpaces++;
+    //             } else {
+    //                 opponentPieces++;
+    //                 break;
+    //             }
+    //         }
+    //     }
 
-        // Score based on potential
-        if (opponentPieces > 0) return 0; // Blocked
-        if (myPieces === 4) return 1000; // Win
-        if (myPieces === 3) return 50;   // Strong threat
-        if (myPieces === 2) return 10;   // Good position
-        return 1; // Basic
-    }
+    //     // Score based on potential
+    //     if (opponentPieces > 0) return 0; // Blocked
+    //     if (myPieces === 4) return 1000; // Win
+    //     if (myPieces === 3) return 50;   // Strong threat
+    //     if (myPieces === 2) return 10;   // Good position
+    //     return 1; // Basic
+    // }
 
-    private evaluateOpponentOpportunities(board: COLOR[][], row: number, col: number): number {
-        // Check if this move gives opponent a chance to win on their next turn
-        if (row > 0) { // If there's a space above this move
-            const testBoard = board.map(row => [...row]);
-            testBoard[row - 1][col] = this.player1Color; // Simulate opponent playing above
+    // private evaluateOpponentOpportunities(board: COLOR[][], row: number, col: number): number {
+    //     // Check if this move gives opponent a chance to win on their next turn
+    //     if (row > 0) { // If there's a space above this move
+    //         const testBoard = board.map(row => [...row]);
+    //         testBoard[row - 1][col] = this.player1Color; // Simulate opponent playing above
 
-            if (this.checkWin(testBoard, row - 1, col, this.player1Color)) {
-                return 1; // This move sets up opponent win
-            }
-        }
-        return 0;
-    }
+    //         if (this.checkWin(testBoard, row - 1, col, this.player1Color)) {
+    //             return 1; // This move sets up opponent win
+    //         }
+    //     }
+    //     return 0;
+    // }
 
-    private evaluateBuildingOnPieces(board: COLOR[][], row: number, col: number, color: COLOR): number {
-        let score = 0;
-        const directions = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+    // private evaluateBuildingOnPieces(board: COLOR[][], row: number, col: number, color: COLOR): number {
+    //     let score = 0;
+    //     const directions = [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
-        // Check for adjacent friendly pieces
-        for (const [dr, dc] of directions) {
-            const r = row + dr;
-            const c = col + dc;
+    //     // Check for adjacent friendly pieces
+    //     for (const [dr, dc] of directions) {
+    //         const r = row + dr;
+    //         const c = col + dc;
 
-            if (r >= 0 && r < board.length && c >= 0 && c < board[0].length) {
-                if (board[r][c] === color) {
-                    score += 1;
-                }
-            }
-        }
+    //         if (r >= 0 && r < board.length && c >= 0 && c < board[0].length) {
+    //             if (board[r][c] === color) {
+    //                 score += 1;
+    //             }
+    //         }
+    //     }
 
-        return score;
-    }
+    //     return score;
+    // }
 
-    private evaluatePositionalAdvantage(board: COLOR[][], row: number, col: number): number {
-        let score = 0;
+    // private evaluatePositionalAdvantage(board: COLOR[][], row: number, col: number): number {
+    //     let score = 0;
 
-        // Prefer lower rows (gravity advantage)
-        score += (board.length - row) * 2;
+    //     // Prefer lower rows (gravity advantage)
+    //     score += (board.length - row) * 2;
 
-        // Prefer positions that control more space
-        const numRows = board.length;
-        const numCols = board[0].length;
+    //     // Prefer positions that control more space
+    //     const numRows = board.length;
+    //     const numCols = board[0].length;
 
-        // Control center area
-        const centerRow = Math.floor(numRows / 2);
-        const centerCol = Math.floor(numCols / 2);
+    //     // Control center area
+    //     const centerRow = Math.floor(numRows / 2);
+    //     const centerCol = Math.floor(numCols / 2);
 
-        const rowDistance = Math.abs(row - centerRow);
-        const colDistance = Math.abs(col - centerCol);
+    //     const rowDistance = Math.abs(row - centerRow);
+    //     const colDistance = Math.abs(col - centerCol);
 
-        score += Math.max(0, 3 - rowDistance);
-        score += Math.max(0, 3 - colDistance);
+    //     score += Math.max(0, 3 - rowDistance);
+    //     score += Math.max(0, 3 - colDistance);
 
-        return score;
-    }
+    //     return score;
+    // }
 
-    private evaluateSetupRisk(board: COLOR[][], row: number, col: number): number {
-        // Check if this move creates a setup for opponent's winning move
-        let risk = 0;
+    // private evaluateSetupRisk(board: COLOR[][], row: number, col: number): number {
+    //     // Check if this move creates a setup for opponent's winning move
+    //     let risk = 0;
 
-        // Check various patterns that might benefit opponent
-        const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+    //     // Check various patterns that might benefit opponent
+    //     const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
 
-        for (const [dr, dc] of directions) {
-            if (this.createsOpponentSetup(board, row, col, dr, dc)) {
-                risk += 1;
-            }
-        }
+    //     for (const [dr, dc] of directions) {
+    //         if (this.createsOpponentSetup(board, row, col, dr, dc)) {
+    //             risk += 1;
+    //         }
+    //     }
 
-        return risk;
-    }
+    //     return risk;
+    // }
 
-    private createsOpponentSetup(board: COLOR[][], row: number, col: number, dr: number, dc: number): boolean {
-        // Check if opponent can build a strong position from this move
-        let opponentCount = 0;
-        let emptyCount = 0;
+    // private createsOpponentSetup(board: COLOR[][], row: number, col: number, dr: number, dc: number): boolean {
+    //     // Check if opponent can build a strong position from this move
+    //     let opponentCount = 0;
+    //     let emptyCount = 0;
 
-        // Check surrounding positions
-        for (let i = -3; i <= 3; i++) {
-            if (i === 0) continue; // Skip the position we're considering
+    //     // Check surrounding positions
+    //     for (let i = -3; i <= 3; i++) {
+    //         if (i === 0) continue; // Skip the position we're considering
 
-            const r = row + i * dr;
-            const c = col + i * dc;
+    //         const r = row + i * dr;
+    //         const c = col + i * dc;
 
-            if (r >= 0 && r < board.length && c >= 0 && c < board[0].length) {
-                if (board[r][c] === this.player1Color) {
-                    opponentCount++;
-                } else if (board[r][c] === BLANK) {
-                    emptyCount++;
-                }
-            }
-        }
+    //         if (r >= 0 && r < board.length && c >= 0 && c < board[0].length) {
+    //             if (board[r][c] === this.player1Color) {
+    //                 opponentCount++;
+    //             } else if (board[r][c] === BLANK) {
+    //                 emptyCount++;
+    //             }
+    //         }
+    //     }
 
-        // If opponent has pieces nearby and empty spaces, it might be a setup
-        return opponentCount >= 1 && emptyCount >= 2;
-    }
+    //     // If opponent has pieces nearby and empty spaces, it might be a setup
+    //     return opponentCount >= 1 && emptyCount >= 2;
+    // }
 
     private checkWin(board: COLOR[][], row: number, col: number, color: COLOR): boolean {
         const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
