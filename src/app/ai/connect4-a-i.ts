@@ -1,5 +1,5 @@
 import { BLANK, COLUMNS, createLocation, random, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
-import type { BoardLocation } from "../objects/interfaces";
+import type { BoardLocation, Game } from "../objects/interfaces";
 import { isGameOver } from "../services/game.service";
 
 export abstract class Connect4AI {
@@ -11,7 +11,7 @@ export abstract class Connect4AI {
         this.player1Color = player1color;
     }
 
-    abstract getMove(board: COLOR[][]): BoardLocation;
+    abstract getMove(board: COLOR[][], gameHistory: Game[]): BoardLocation;
 
     protected findImmediateThreat(validMoves: BoardLocation[], board: COLOR[][]): BoardLocation {
         for (const move of validMoves) {
