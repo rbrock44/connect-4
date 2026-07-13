@@ -1,4 +1,4 @@
-import { BLANK, PLAYER1, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
+import { BLANK, PLAYER1, PLAYER2, RED, YELLOW, type COLOR, type PLAYER_COLOR } from "../constants";
 import type { BoardLocation, Game } from "../objects/interfaces";
 import { checkEverything, isGameOver } from "../services/game.service";
 import { Connect4AI } from "./connect4-a-i";
@@ -21,6 +21,52 @@ let weights: LearningWeights = {
     patternMatching: 0.6,
     gameHistoryBias: 0.4
 };
+
+// Learned weights + patterns are persisted so the AI keeps getting harder
+// across browser sessions rather than resetting every page load.
+const LEARNING_STORAGE_KEY = 'connect4-iterative-learning';
+
+interface PersistedLearningState {
+    weights: LearningWeights;
+    patterns: [string, number][];
+}
+
+function hasLocalStorage(): boolean {
+    return typeof localStorage !== 'undefined';
+}
+
+function loadLearningState(): void {
+    if (!hasLocalStorage()) return;
+
+    try {
+        const raw = localStorage.getItem(LEARNING_STORAGE_KEY);
+        if (!raw) return;
+
+        const parsed = JSON.parse(raw) as PersistedLearningState;
+        weights = { ...weights, ...parsed.weights };
+        for (const [key, value] of parsed.patterns ?? []) {
+            patternCache.set(key, value);
+        }
+    } catch {
+        // Ignore corrupt/unavailable storage - fall back to defaults.
+    }
+}
+
+function saveLearningState(): void {
+    if (!hasLocalStorage()) return;
+
+    try {
+        const state: PersistedLearningState = {
+            weights,
+            patterns: Array.from(patternCache.entries())
+        };
+        localStorage.setItem(LEARNING_STORAGE_KEY, JSON.stringify(state));
+    } catch {
+        // Ignore quota/serialization errors - learning continues in-memory only.
+    }
+}
+
+loadLearningState();
 
 export class AIIterative extends Connect4AI {
     depth: number = 6;
@@ -66,7 +112,7 @@ export class AIIterative extends Connect4AI {
         const newBoard = this.simulateMove(board, move);
 
         if (depth === 0 || isGameOver(newBoard)) {
-            const score = this.evaluatePosition(newBoard, gameHistory);
+            const score = this.evaluatePosition(newBoard);
             positionCache.set(boardKey, score);
             return score;
         }
@@ -102,7 +148,7 @@ export class AIIterative extends Connect4AI {
         return bestScore;
     }
 
-    evaluatePosition(board: COLOR[][], gameHistory: Game[]): number {
+    evaluatePosition(board: COLOR[][]): number {
         let score = 0;
 
         // 1. Check for immediate wins/losses
@@ -121,7 +167,7 @@ export class AIIterative extends Connect4AI {
         score += this.evaluateBlockingMoves(board) * weights.blockingMoves;
 
         // 5. Pattern matching from game history (learned weight)
-        score += this.evaluateHistoricalPatterns(board, gameHistory) * weights.patternMatching;
+        score += this.evaluateHistoricalPatterns(board) * weights.patternMatching;
 
         // 6. Strategic positioning
         score += this.evaluateStrategicPosition(board);
@@ -137,9 +183,11 @@ export class AIIterative extends Connect4AI {
         const recentGames = gameHistory.slice(-10);
 
         for (const game of recentGames) {
-            if (game.winner === this.color) {
+            // The AI opponent is always Player 2 in this app; `winner` is stored
+            // as 'player1'/'player2'/'draw', not a piece color.
+            if (game.winner === PLAYER2) {
                 wins++;
-            } else if (game.winner === this.player1Color) {
+            } else if (game.winner === PLAYER1) {
                 losses++;
             }
         }
@@ -154,7 +202,9 @@ export class AIIterative extends Connect4AI {
             weights.centerControl = Math.min(0.5, weights.centerControl * 1.1);
         }
 
-        this.extractPatternsFromHistory(recentGames.filter(g => g.winner === this.color));
+        this.extractPatternsFromHistory(recentGames.filter(g => g.winner === PLAYER2));
+
+        saveLearningState();
     }
 
     extractPatternsFromHistory(winningGames: Game[]): void {
@@ -171,7 +221,7 @@ export class AIIterative extends Connect4AI {
         }
     }
 
-    evaluateHistoricalPatterns(board: COLOR[][], gameHistory: Game[]): number {
+    evaluateHistoricalPatterns(board: COLOR[][]): number {
         let patternScore = 0;
 
         for (let row = 0; row < board.length; row++) {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
+import { loadGameHistory, saveGameHistory } from "../../services/storage.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 import ConfirmationDialog from "../confirmation-dialog/confirmation-dialog";
@@ -18,7 +19,7 @@ const Board = () => {
     const [winningCells, setWinningCells] = useState<number[][]>([]);
     const [processingClick, setProcessingClick] = useState<boolean>(false);
     const [activeGame, setActiveGame] = useState<ActiveGame>(startGame(player1Color, player2Color, player2Type));
-    const [gameHistory, setGameHistory] = useState<Game[]>([]);
+    const [gameHistory, setGameHistory] = useState<Game[]>(loadGameHistory);
     const [isConfirmationOpen, setConfirmationOpen] = useState<boolean>(false);
 
     const [hoveredColumn, setHoveredColumn] = useState<number | null>(5);
@@ -74,7 +75,7 @@ const Board = () => {
             //check to see if anybody won or there's a draw, else next move please
             const status: Status = checkEverything(player1Color, newBoard);
             if (status.isGameOver) {
-                handleGameOver(status);
+                handleGameOver(status, newBoard);
             } else {
                 if (shouldMakeNextMove(player2Type)) {
                     const dummyBoard = newBoard.map(row => [...row]);
@@ -91,7 +92,7 @@ const Board = () => {
 
                     const newStatus: Status = checkEverything(player1Color, newBoard);
                     if (newStatus.isGameOver) {
-                        handleGameOver(newStatus);
+                        handleGameOver(newStatus, newBoard);
                     }
                 } else {
                     // human player -> invert who's turn it is
@@ -106,19 +107,20 @@ const Board = () => {
         setProcessingClick(false);
     };
 
-    function handleGameOver(status: Status): void {
+    function handleGameOver(status: Status, finalBoard: COLOR[][]): void {
         setGameOver(true);
         setWinningCells(status.winningCells);
         setWinner(status.winner);
-        
-        if (gameOver && isIterativeAI(player2Type)) {
+
+        if (isIterativeAI(player2Type)) {
             const endedGame: EndedGame = {
-                board: board,
+                board: finalBoard,
                 winningCells: status.winningCells,
                 winner: status.winner
             }
-            gameHistory.push(endGame(activeGame, endedGame))
-            setGameHistory(gameHistory)
+            const updatedHistory = [...gameHistory, endGame(activeGame, endedGame)];
+            setGameHistory(updatedHistory);
+            saveGameHistory(updatedHistory);
         }
     };
 
