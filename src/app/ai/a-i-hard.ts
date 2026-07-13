@@ -180,8 +180,16 @@ export class AIHard extends Connect4AI {
             }
         }
 
-        criticalMoves.sort((a, b) => this.getPositionValue(b.column) - this.getPositionValue(a.column));
-        if (criticalMoves.length > 0 && criticalMoves.length !== 3) {
+        if (criticalMoves.length === 3) {
+            // Double-open-three (e.g. columns 0/2/4 around a shared gap): the middle
+            // column by board position is the bridge that defuses both threats at
+            // once, so it must be picked by column order, not centrality score.
+            const sortedByColumn = [...criticalMoves].sort((a, b) => a.column - b.column);
+            return sortedByColumn[1];
+        }
+
+        if (criticalMoves.length > 0) {
+            criticalMoves.sort((a, b) => this.getPositionValue(b.column) - this.getPositionValue(a.column));
             for (const move of criticalMoves) {
                 if (!this.setsUpOpponent(board, move.row, move.column)) {
                      console.log('Critical move found - column: ' + move.column + ' row: '+ move.row);
@@ -190,8 +198,6 @@ export class AIHard extends Connect4AI {
                 }
             }
             return criticalMoves[0];
-        } else if (criticalMoves.length === 3) {
-            return criticalMoves[1];
         }
 
         return createLocation();
