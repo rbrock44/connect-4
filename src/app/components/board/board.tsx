@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
-import { loadGameHistory, saveGameHistory } from "../../services/storage.service";
+import { clearGameHistory, loadGameHistory, saveGameHistory } from "../../services/storage.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 import ConfirmationDialog from "../confirmation-dialog/confirmation-dialog";
@@ -21,6 +21,7 @@ const Board = () => {
     const [activeGame, setActiveGame] = useState<ActiveGame>(startGame(player1Color, player2Color, player2Type));
     const [gameHistory, setGameHistory] = useState<Game[]>(loadGameHistory);
     const [isConfirmationOpen, setConfirmationOpen] = useState<boolean>(false);
+    const [isClearHistoryConfirmationOpen, setClearHistoryConfirmationOpen] = useState<boolean>(false);
 
     const [hoveredColumn, setHoveredColumn] = useState<number | null>(5);
 
@@ -147,6 +148,12 @@ const Board = () => {
         }
     };
 
+    const handleClearHistory = () => {
+        setGameHistory([]);
+        clearGameHistory();
+        setClearHistoryConfirmationOpen(false);
+    };
+
     const isWinningCell = (row: number, col: number): boolean => {
         return winningCells.length > 0 && winningCells.some(([r, c]) => r === row && c === col);
     };
@@ -225,7 +232,7 @@ const Board = () => {
                 </div>
 
                 <div className="mt-4 text-center text-blue-200 w-full">
-                    <div className="text-center flex justify-center w-full">
+                    <div className="text-center flex justify-center gap-2 w-full">
                         <button
                             disabled={!gameStarted}
                             onClick={handleRestartWarning}
@@ -235,6 +242,17 @@ const Board = () => {
                         >
                             Clear Board
                         </button>
+                        {isIterativeAI(player2Type) && (
+                            <button
+                                disabled={gameHistory.length === 0}
+                                onClick={() => setClearHistoryConfirmationOpen(true)}
+                                className={`h-6 w-fit !p-2 mb-2 !bg-amber-700 rounded-full text-sm flex items-center justify-center shadow hover:bg-blue-100 transition
+                                    ${gameHistory.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100'}
+                                `}
+                            >
+                                Clear AI History
+                            </button>
+                        )}
                     </div>
                     <p className="text-sm">
                         Click any column to lay a game piece
@@ -307,6 +325,15 @@ const Board = () => {
                 resetGame={() => {handleRestart(); setConfirmationOpen(false);}} 
                 closePopup={() => setConfirmationOpen(false)}            
                 />
+
+            <ConfirmationDialog
+                isOpen={isClearHistoryConfirmationOpen}
+                resetGame={handleClearHistory}
+                closePopup={() => setClearHistoryConfirmationOpen(false)}
+                title="Clear AI History?"
+                description="This will permanently delete the saved game history the Iterative AI uses to learn. This action cannot be undone."
+                confirmText="Clear History"
+            />
         </div>
     );
 };

@@ -5,6 +5,7 @@ interface ConfirmationDialogProps {
     closePopup: () => void;
     title?: string;
     description?: string;
+    confirmText?: string;
   }
 
 export default function ConfirmationDialog({ 
@@ -12,7 +13,8 @@ export default function ConfirmationDialog({
     resetGame,
     closePopup,
     title = "Reset Game?", 
-    description = "This will clear the current game board and start a new game. This action cannot be undone." 
+    description = "This will clear the current game board and start a new game. This action cannot be undone.",
+    confirmText = "Reset Game"
   }: ConfirmationDialogProps) {
     
   const handleReset = () => {
@@ -64,7 +66,7 @@ export default function ConfirmationDialog({
                 onClick={handleReset}
                 className="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded-lg transition-colors font-medium"
               >
-                Reset Game
+                {confirmText}
               </button>
             </div>
           </div>

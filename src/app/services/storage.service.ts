@@ -30,3 +30,13 @@ export function saveGameHistory(history: Game[]): void {
         // Ignore quota/serialization errors - learning falls back to in-memory only.
     }
 }
+
+export function clearGameHistory(): void {
+    if (!hasLocalStorage()) return;
+
+    try {
+        localStorage.removeItem(GAME_HISTORY_KEY);
+    } catch {
+        // Ignore storage errors - in-memory history will still be cleared.
+    }
+}
