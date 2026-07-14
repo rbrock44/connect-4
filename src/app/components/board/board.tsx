@@ -182,8 +182,8 @@ const Board = () => {
     }
 
     return (
-        <div className="flex flex-col items-center min-w-sm m-0 p-4 sm:p-4 md:p-4 lg:p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
-            <h1 className="text-4xl font-bold text-white mb-8 text-center">
+        <div className="flex flex-col items-center min-w-sm m-0 p-4 sm:p-4 md:p-4 lg:p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-2xl">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4 text-center leading-tight">
                 Connect <span className="text-yellow-400">4</span>
             </h1>
 
