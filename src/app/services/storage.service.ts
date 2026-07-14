@@ -40,3 +40,33 @@ export function clearGameHistory(): void {
         // Ignore storage errors - in-memory history will still be cleared.
     }
 }
+
+// Only nag the user once per calendar day when they navigate backward in moves.
+const BACKWARD_CONFIRM_KEY = 'connect4-backward-confirm-date';
+
+function getTodayDateString(): string {
+    const now = new Date();
+    return now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
+}
+
+export function hasShownBackwardConfirmationToday(): boolean {
+    if (!hasLocalStorage()) return false;
+
+    try {
+        return localStorage.getItem(BACKWARD_CONFIRM_KEY) === getTodayDateString();
+    } catch {
+        return false;
+    }
+}
+
+export function markBackwardConfirmationShownToday(): void {
+    if (!hasLocalStorage()) return;
+
+    try {
+        localStorage.setItem(BACKWARD_CONFIRM_KEY, getTodayDateString());
+    } catch {
+        // Ignore storage errors - dialog will just show again next time.
+    }
+}

@@ -9,4 +9,5 @@ export {
     type ActiveGame, 
     type EndedGame, 
     type Game,
+    type BoardSnapshot,
 } from './interfaces';

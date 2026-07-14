@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
-import type { ActiveGame, EndedGame, Game, Move, Status } from "../../objects";
+import type { ActiveGame, BoardSnapshot, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
-import { clearGameHistory, loadGameHistory, saveGameHistory } from "../../services/storage.service";
+import { clearGameHistory, hasShownBackwardConfirmationToday, loadGameHistory, markBackwardConfirmationShownToday, saveGameHistory } from "../../services/storage.service";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 import ConfirmationDialog from "../confirmation-dialog/confirmation-dialog";
+
+function createInitialSnapshot(): BoardSnapshot {
+    return {
+        board: createEmptyBoard(),
+        firstPlayerTurn: true,
+        gameOver: false,
+        winner: '',
+        winningCells: [],
+        movesLength: 0,
+    };
+}
 
 const Board = () => {
     const [board, setBoard] = useState<COLOR[][]>(createEmptyBoard);
@@ -22,6 +33,9 @@ const Board = () => {
     const [gameHistory, setGameHistory] = useState<Game[]>(loadGameHistory);
     const [isConfirmationOpen, setConfirmationOpen] = useState<boolean>(false);
     const [isClearHistoryConfirmationOpen, setClearHistoryConfirmationOpen] = useState<boolean>(false);
+    const [isBackConfirmationOpen, setBackConfirmationOpen] = useState<boolean>(false);
+    const [moveHistory, setMoveHistory] = useState<BoardSnapshot[]>([createInitialSnapshot()]);
+    const [moveHistoryIndex, setMoveHistoryIndex] = useState<number>(0);
 
     const [hoveredColumn, setHoveredColumn] = useState<number | null>(5);
 
@@ -55,6 +69,16 @@ const Board = () => {
             setActiveGame(startGame(player1Color, player2Color, player2Type))
             setGameStarted(true);
         }
+
+        // Making a new move from a past point in history discards the moves
+        // that were "ahead" of it - they no longer apply to this new timeline.
+        const historyBeforeMove = moveHistoryIndex < moveHistory.length - 1
+            ? moveHistory.slice(0, moveHistoryIndex + 1)
+            : moveHistory;
+        if (historyBeforeMove !== moveHistory) {
+            activeGame.moves = activeGame.moves.slice(0, historyBeforeMove[historyBeforeMove.length - 1].movesLength);
+        }
+
         let newBoard = board.map(row => [...row]);
 
         const color = getColorForMove(player1Color, player2Color, firstPlayerTurn);
@@ -73,8 +97,12 @@ const Board = () => {
             activeGame.moves.push(playerMove);
             console.log(firstPlayerTurn ? PLAYER1 : PLAYER2 + ' MOVE: ', foundIndex, col)
 
+            let newFirstPlayerTurn = firstPlayerTurn;
+            let finalStatus: Status;
+
             //check to see if anybody won or there's a draw, else next move please
             const status: Status = checkEverything(player1Color, newBoard);
+            finalStatus = status;
             if (status.isGameOver) {
                 handleGameOver(status, newBoard);
             } else {
@@ -92,17 +120,31 @@ const Board = () => {
                     activeGame.moves.push(aiMove);
 
                     const newStatus: Status = checkEverything(player1Color, newBoard);
+                    finalStatus = newStatus;
                     if (newStatus.isGameOver) {
                         handleGameOver(newStatus, newBoard);
                     }
                 } else {
                     // human player -> invert who's turn it is
-                    setFirstPlayerTurn(!firstPlayerTurn);
+                    newFirstPlayerTurn = !firstPlayerTurn;
+                    setFirstPlayerTurn(newFirstPlayerTurn);
                 }
             }
 
             setBoard(newBoard);
             console.log('newBoard: ', newBoard)
+
+            const snapshot: BoardSnapshot = {
+                board: newBoard.map(row => [...row]),
+                firstPlayerTurn: newFirstPlayerTurn,
+                gameOver: finalStatus.isGameOver,
+                winner: finalStatus.isGameOver ? finalStatus.winner : '',
+                winningCells: finalStatus.isGameOver ? finalStatus.winningCells : [],
+                movesLength: activeGame.moves.length,
+            };
+            const updatedMoveHistory = [...historyBeforeMove, snapshot];
+            setMoveHistory(updatedMoveHistory);
+            setMoveHistoryIndex(updatedMoveHistory.length - 1);
         }
 
         setProcessingClick(false);
@@ -138,6 +180,8 @@ const Board = () => {
         setWinner('');
         setFirstPlayerTurn(true);
         setWinningCells([]);
+        setMoveHistory([createInitialSnapshot()]);
+        setMoveHistoryIndex(0);
     };
 
     const handleRestartWarning = () => {
@@ -146,6 +190,40 @@ const Board = () => {
         } else {
             setConfirmationOpen(true);
         }
+    };
+
+    const navigateToMove = (index: number): void => {
+        const snapshot = moveHistory[index];
+        if (!snapshot) return;
+
+        setBoard(snapshot.board.map(row => [...row]));
+        setFirstPlayerTurn(snapshot.firstPlayerTurn);
+        setGameOver(snapshot.gameOver);
+        setWinner(snapshot.winner);
+        setWinningCells(snapshot.winningCells);
+        setMoveHistoryIndex(index);
+    };
+
+    const handleGoBack = () => {
+        if (processingClick || moveHistoryIndex <= 0) return;
+
+        if (hasShownBackwardConfirmationToday()) {
+            navigateToMove(moveHistoryIndex - 1);
+        } else {
+            setBackConfirmationOpen(true);
+        }
+    };
+
+    const handleConfirmGoBack = () => {
+        markBackwardConfirmationShownToday();
+        setBackConfirmationOpen(false);
+        navigateToMove(moveHistoryIndex - 1);
+    };
+
+    const handleGoForward = () => {
+        if (processingClick || moveHistoryIndex >= moveHistory.length - 1) return;
+
+        navigateToMove(moveHistoryIndex + 1);
     };
 
     const handleClearHistory = () => {
@@ -233,6 +311,24 @@ const Board = () => {
 
                 <div className="mt-4 text-center text-blue-200 w-full">
                     <div className="text-center flex justify-center gap-2 w-full">
+                        <button
+                            disabled={!gameStarted || moveHistoryIndex <= 0}
+                            onClick={handleGoBack}
+                            className={`h-6 w-fit !p-2 mb-2 !bg-amber-700 rounded-full text-sm flex items-center justify-center shadow hover:bg-blue-100 transition
+                                ${(!gameStarted || moveHistoryIndex <= 0) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100'}
+                            `}
+                        >
+                            ◀ Back
+                        </button>
+                        <button
+                            disabled={!gameStarted || moveHistoryIndex >= moveHistory.length - 1}
+                            onClick={handleGoForward}
+                            className={`h-6 w-fit !p-2 mb-2 !bg-amber-700 rounded-full text-sm flex items-center justify-center shadow hover:bg-blue-100 transition
+                                ${(!gameStarted || moveHistoryIndex >= moveHistory.length - 1) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100'}
+                            `}
+                        >
+                            Forward ▶
+                        </button>
                         <button
                             disabled={!gameStarted}
                             onClick={handleRestartWarning}
@@ -333,6 +429,15 @@ const Board = () => {
                 title="Clear AI History?"
                 description="This will permanently delete the saved game history the Iterative AI uses to learn. This action cannot be undone."
                 confirmText="Clear History"
+            />
+
+            <ConfirmationDialog
+                isOpen={isBackConfirmationOpen}
+                resetGame={handleConfirmGoBack}
+                closePopup={() => setBackConfirmationOpen(false)}
+                title="Go Back a Move?"
+                description="This will rewind the board to a previous move. If you play a new move from here, any later moves will be lost."
+                confirmText="Go Back"
             />
         </div>
     );

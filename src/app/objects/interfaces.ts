@@ -42,3 +42,12 @@ export interface EndedGame {
 export interface Game extends ActiveGame, EndedGame {
     endTime: string;
 }
+
+export interface BoardSnapshot {
+    board: COLOR[][];
+    firstPlayerTurn: boolean;
+    gameOver: boolean;
+    winner: string;
+    winningCells: number[][];
+    movesLength: number;
+}
