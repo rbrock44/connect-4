@@ -4,9 +4,18 @@ import type { Game } from "../objects/interfaces";
 // over many play sessions.
 const GAME_HISTORY_KEY = 'connect4-game-history';
 const MAX_STORED_GAMES = 50;
+// Only nag the user once per calendar day when they navigate backward in moves.
+const BACKWARD_CONFIRM_KEY = 'connect4-backward-confirm-date';
 
 function hasLocalStorage(): boolean {
     return typeof localStorage !== 'undefined';
+}
+
+function getTodayDateString(): string {
+    const now = new Date();
+    return now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
 }
 
 export function loadGameHistory(): Game[] {
@@ -39,16 +48,6 @@ export function clearGameHistory(): void {
     } catch {
         // Ignore storage errors - in-memory history will still be cleared.
     }
-}
-
-// Only nag the user once per calendar day when they navigate backward in moves.
-const BACKWARD_CONFIRM_KEY = 'connect4-backward-confirm-date';
-
-function getTodayDateString(): string {
-    const now = new Date();
-    return now.getFullYear() + '-' +
-        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getDate()).padStart(2, '0');
 }
 
 export function hasShownBackwardConfirmationToday(): boolean {
