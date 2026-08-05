@@ -14,13 +14,15 @@ interface LearningWeights {
     gameHistoryBias: number;
 }
 
-let weights: LearningWeights = {
+const DEFAULT_WEIGHTS: LearningWeights = {
     centerControl: 0.3,
     winningMoves: 1.0,
     blockingMoves: 0.8,
     patternMatching: 0.6,
     gameHistoryBias: 0.4
 };
+
+let weights: LearningWeights = { ...DEFAULT_WEIGHTS };
 
 // Learned weights + patterns are persisted so the AI keeps getting harder
 // across browser sessions rather than resetting every page load.
@@ -67,6 +69,24 @@ function saveLearningState(): void {
 }
 
 loadLearningState();
+
+// Resets the AI's learned weights and pattern/position caches back to their
+// defaults, both in memory and in localStorage. Used by the "Clear AI
+// History" action so it actually resets the AI's learning, not just the
+// separate game-history log.
+export function resetLearningState(): void {
+    weights = { ...DEFAULT_WEIGHTS };
+    patternCache.clear();
+    positionCache.clear();
+
+    if (!hasLocalStorage()) return;
+
+    try {
+        localStorage.removeItem(LEARNING_STORAGE_KEY);
+    } catch {
+        // Ignore storage-access errors - in-memory state is already reset.
+    }
+}
 
 export class AIIterative extends Connect4AI {
     depth: number = 6;

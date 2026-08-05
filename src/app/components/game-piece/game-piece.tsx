@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import { BLANK, RED, YELLOW } from "../../constants";
 
 const GamePiece = ({
@@ -10,6 +11,7 @@ const GamePiece = ({
     isColumnHovered = false,
     colIndex = 0,
     setColumnHovered = (_: number | null) => { },
+    ariaLabel = undefined as string | undefined,
 }) => {
     const getStateClasses = () => {
         switch (state) {
@@ -30,6 +32,14 @@ const GamePiece = ({
 
     const handleMouseLeave = () => {
         setColumnHovered(null);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (isDisabled) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onClick();
+        }
     };
 
     const columnHoverClasses = active && isColumnHovered
@@ -68,6 +78,11 @@ const GamePiece = ({
             onClick={!isDisabled ? onClick : undefined}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={isDisabled ? -1 : 0}
+            aria-label={ariaLabel ?? `Drop piece in column ${colIndex + 1}`}
+            aria-disabled={isDisabled}
         >
             
             <div className="absolute top-0.5 left-0.5 sm:top-1 sm:left-1 w-2 h-2 sm:w-3 sm:h-3 bg-white/30 rounded-full blur-sm" />

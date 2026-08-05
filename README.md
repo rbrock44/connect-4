@@ -26,7 +26,7 @@ Screenshots:
 
 ## 🧠 What's My Purpose?
 
-This is a server side single-page react frontend created to play Connect 4 against another human or various AI difficulties [WIP]. I've enjoyed Connect 4 since high school, where a particular teacher (and football coach) was very good and I had to rise to the occasion as competition. I created this application in the Summer of 2025 when I was unemployed (laid off).  
+This is a client side single-page react frontend created to play Connect 4 against another human or various AI difficulties [WIP]. I've enjoyed Connect 4 since high school, where a particular teacher (and football coach) was very good and I had to rise to the occasion as competition. I created this application in the Summer of 2025 when I was unemployed (laid off).  
 
 ---
 
@@ -71,7 +71,7 @@ Screenshots:
 
 ```
 npm install
-npm start
+npm run dev
 ```
 
 ---
@@ -86,7 +86,7 @@ npm start
 
 ### Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ---
 

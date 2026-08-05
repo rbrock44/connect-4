@@ -3,6 +3,7 @@ import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE,
 import type { ActiveGame, BoardSnapshot, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import { clearGameHistory, hasShownBackwardConfirmationToday, loadGameHistory, markBackwardConfirmationShownToday, saveGameHistory } from "../../services/storage.service";
+import { resetLearningState } from "../../ai/a-i-iterative";
 import GamePiece from '../game-piece/game-piece';
 import PlayerTypeSelector from "../player-type-selector/player-type-selector";
 import ConfirmationDialog from "../confirmation-dialog/confirmation-dialog";
@@ -63,6 +64,8 @@ const Board = () => {
     }, []);
 
     const handlePieceClick = (col: number) => {
+        if (gameOver) return;
+
         setProcessingClick(true);
         // is first move?
         if (!gameStarted) {
@@ -229,6 +232,7 @@ const Board = () => {
     const handleClearHistory = () => {
         setGameHistory([]);
         clearGameHistory();
+        resetLearningState();
         setClearHistoryConfirmationOpen(false);
     };
 
@@ -248,6 +252,16 @@ const Board = () => {
         return firstPlayerTurn ? `Player 1's Turn` : (isPlayer2Human(player2Type) ? `Player 2's Turn` : '');
     }
 
+    function liveAnnouncement(): string {
+        if (gameOver) {
+            return determineWinningMessage(winner, player2Type);
+        }
+        if (!gameStarted) {
+            return '';
+        }
+        return firstPlayerTurn ? `Player 1's turn` : (isPlayer2Human(player2Type) ? `Player 2's turn` : `AI's turn`);
+    }
+
     function handleUrlParam(param: string, value: string, shouldDelete: boolean): void {
         const url = new URL(window.location.href);
         
@@ -264,6 +278,10 @@ const Board = () => {
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4 text-center leading-tight">
                 Connect <span className="text-yellow-400">4</span>
             </h1>
+
+            <div aria-live="polite" role="status" className="sr-only">
+                {liveAnnouncement()}
+            </div>
 
             <div className="relative">
                 <div
@@ -286,6 +304,7 @@ const Board = () => {
                                 isSelected={player1Color === YELLOW}
                                 isDisabled={gameStarted}
                                 isSmall={true}
+                                ariaLabel="Select Yellow for Player 1"
                             />
                         </div>
                         <GamePiece
@@ -295,6 +314,7 @@ const Board = () => {
                             isSelected={player1Color === RED}
                             isDisabled={gameStarted}
                             isSmall={true}
+                            ariaLabel="Select Red for Player 1"
                         />
                     </div>
 
