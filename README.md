@@ -7,7 +7,7 @@
 Screenshots:
 ![preview](/screenshots/main.png)
 ![game started](/screenshots/game-started.png)
-![game ended](/screenshots/game-ended.png)
+![game ended](/screenshots/game-over.png)
 
 ---
 
@@ -21,6 +21,7 @@ Screenshots:
   - [GitHub Hooks](#github-hooks)
   - [Build](#build)
   - [Deploy](#deploy)
+- [How to Contribute](#-how-to-contribute)
 
 ---
 
@@ -48,7 +49,7 @@ Other Actions
 Screenshots:
 ![preview](/screenshots/main.png)
 ![game started](/screenshots/game-started.png)
-![game ended](/screenshots/game-ended.png)
+![game ended](/screenshots/game-over.png)
 
 ---
 
@@ -93,5 +94,12 @@ Run `npm run build` to build the project. The build artifacts will be stored in 
 ### Deploy
 
 Run `npm run prod` to build and deploy the project. Make sure to be on `master` and that it is up to date before running the command. It's really meant to be a CI/CD action
+
+---
+
+## 🤝 How to Contribute
+
+Found a typo or a small, obvious fix? Open a PR directly.
+Want to change behavior or add something bigger? Open an issue first so we can talk it through before you put in the work.
 
 ---
