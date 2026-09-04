@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
+import { useEffect, useRef, useState } from "react";
+import { BLANK, COLUMNS, createEmptyBoard, endGame, findRowToPlacePiece, HARD, HUMAN, ITERATIVE, MEDIUM, PLAYER1, PLAYER2, RED, ROWS, startGame, YELLOW, type AI_TYPE, type COLOR, type PLAYER_COLOR, type PLAYER_TYPE } from "../../constants";
 import type { ActiveGame, BoardSnapshot, EndedGame, Game, Move, Status } from "../../objects";
 import { checkEverything, determineWinningMessage, getAIMove, getColorForMove, isIterativeAI, isPlayer2Human, shouldMakeNextMove } from "../../services/game.service";
 import { clearGameHistory, hasShownBackwardConfirmationToday, loadGameHistory, markBackwardConfirmationShownToday, saveGameHistory } from "../../services/storage.service";
@@ -39,6 +39,10 @@ const Board = () => {
     const [moveHistoryIndex, setMoveHistoryIndex] = useState<number>(0);
 
     const [hoveredColumn, setHoveredColumn] = useState<number | null>(5);
+    const [focusedColumn, setFocusedColumn] = useState<number>(0);
+    const [lastMoveDescription, setLastMoveDescription] = useState<string>('');
+    const boardGridRef = useRef<HTMLDivElement>(null);
+    const hasKeyboardNavigatedRef = useRef<boolean>(false);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -102,6 +106,10 @@ const Board = () => {
 
             let newFirstPlayerTurn = firstPlayerTurn;
             let finalStatus: Status;
+            let moveDescription = describeMove(
+                firstPlayerTurn ? 'Player 1' : (isPlayer2Human(player2Type) ? 'Player 2' : 'You'),
+                col
+            );
 
             //check to see if anybody won or there's a draw, else next move please
             const status: Status = checkEverything(player1Color, newBoard);
@@ -121,6 +129,7 @@ const Board = () => {
                         playerMoveType: 'ai'
                     }
                     activeGame.moves.push(aiMove);
+                    moveDescription = describeMove('AI', move.column);
 
                     const newStatus: Status = checkEverything(player1Color, newBoard);
                     finalStatus = newStatus;
@@ -134,6 +143,7 @@ const Board = () => {
                 }
             }
 
+            setLastMoveDescription(moveDescription);
             setBoard(newBoard);
             console.log('newBoard: ', newBoard)
 
@@ -185,6 +195,8 @@ const Board = () => {
         setWinningCells([]);
         setMoveHistory([createInitialSnapshot()]);
         setMoveHistoryIndex(0);
+        setLastMoveDescription('');
+        setFocusedColumn(0);
     };
 
     const handleRestartWarning = () => {
@@ -205,6 +217,7 @@ const Board = () => {
         setWinner(snapshot.winner);
         setWinningCells(snapshot.winningCells);
         setMoveHistoryIndex(index);
+        setLastMoveDescription('');
     };
 
     const handleGoBack = () => {
@@ -240,6 +253,64 @@ const Board = () => {
         return winningCells.length > 0 && winningCells.some(([r, c]) => r === row && c === col);
     };
 
+    const isColumnFull = (col: number): boolean => {
+        return findRowToPlacePiece(board, col) === ROWS;
+    };
+
+    const getDiscCount = (col: number): number => {
+        return board.reduce((count, row) => count + (row[col] !== BLANK ? 1 : 0), 0);
+    };
+
+    const describeMove = (mover: string, col: number): string => {
+        return `${mover} dropped a piece in column ${col + 1}.`;
+    };
+
+    // Roving tabindex: arrow keys move keyboard focus between columns without
+    // tabbing through every cell in the grid; Home/End jump to the first/last
+    // playable column. The focused column is skipped forward/back over full
+    // columns so focus never lands somewhere there's nothing to activate.
+    const moveFocusToColumn = (from: number, key: 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End') => {
+        if (key === 'Home') {
+            for (let col = 0; col < COLUMNS; col++) {
+                if (!isColumnFull(col)) return setFocusedColumn(col);
+            }
+            return;
+        }
+        if (key === 'End') {
+            for (let col = COLUMNS - 1; col >= 0; col--) {
+                if (!isColumnFull(col)) return setFocusedColumn(col);
+            }
+            return;
+        }
+
+        const step = key === 'ArrowLeft' ? -1 : 1;
+        let next = from + step;
+        while (next >= 0 && next < COLUMNS) {
+            if (!isColumnFull(next)) {
+                setFocusedColumn(next);
+                return;
+            }
+            next += step;
+        }
+    };
+
+    const handleColumnArrowKey = (from: number, key: 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End') => {
+        hasKeyboardNavigatedRef.current = true;
+        moveFocusToColumn(from, key);
+    };
+
+    // Only move real DOM focus in response to actual arrow-key navigation - not
+    // on mount, and not on every unrelated board update - so the grid never
+    // steals focus from the rest of the page on its own.
+    useEffect(() => {
+        if (!hasKeyboardNavigatedRef.current) return;
+
+        const activeCell = boardGridRef.current?.querySelector<HTMLDivElement>(
+            `[data-col="${focusedColumn}"][data-active-cell="true"]`
+        );
+        activeCell?.focus();
+    }, [focusedColumn]);
+
     function handlePlayer2Change(val: PLAYER_TYPE): void {
         setPlayer2Type(val);
         handleUrlParam(PLAYER2, val, val === HUMAN);
@@ -254,12 +325,13 @@ const Board = () => {
 
     function liveAnnouncement(): string {
         if (gameOver) {
-            return determineWinningMessage(winner, player2Type);
+            return `${lastMoveDescription} ${determineWinningMessage(winner, player2Type)}`.trim();
         }
         if (!gameStarted) {
             return '';
         }
-        return firstPlayerTurn ? `Player 1's turn` : (isPlayer2Human(player2Type) ? `Player 2's turn` : `AI's turn`);
+        const turnText = firstPlayerTurn ? `Player 1's turn.` : (isPlayer2Human(player2Type) ? `Player 2's turn.` : `AI's turn.`);
+        return `${lastMoveDescription} ${turnText}`.trim();
     }
 
     function handleUrlParam(param: string, value: string, shouldDelete: boolean): void {
@@ -396,23 +468,45 @@ const Board = () => {
                                 '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)'
                         }}
                     >
-                        <div className="grid grid-cols-7 gap-3 bg-gradient-to-br from-blue-700 to-blue-800 p-4 rounded-xl">
-                            {board.map((row, rowIndex) =>
-                                row.map((cell, colIndex) => (
-                                    <div key={`${rowIndex}-${colIndex}`} className="relative">
-                                        <GamePiece
-                                            isSelected={isWinningCell(rowIndex, colIndex)}
-                                            state={cell}
-                                            onClick={() => handlePieceClick(colIndex)}
-                                            isHoverable={!gameOver}
-                                            isDisabled={processingClick}
-                                            isColumnHovered={colIndex === hoveredColumn}
-                                            setColumnHovered={(column: number | null) => setHoveredColumn(column)}
-                                            colIndex={colIndex}
-                                        />
-                                    </div>
-                                ))
-                            )}
+                        <div
+                            ref={boardGridRef}
+                            role="grid"
+                            aria-label="Connect 4 board"
+                            aria-rowcount={ROWS}
+                            aria-colcount={COLUMNS}
+                            className="grid grid-cols-7 gap-3 bg-gradient-to-br from-blue-700 to-blue-800 p-4 rounded-xl"
+                        >
+                            {board.map((row, rowIndex) => (
+                                <div key={rowIndex} role="row" className="contents">
+                                    {row.map((cell, colIndex) => {
+                                        const isActiveCell = rowIndex === findRowToPlacePiece(board, colIndex);
+                                        const cellLabel = cell === RED ? 'Red disc' : cell === YELLOW ? 'Yellow disc' : 'Empty';
+                                        return (
+                                            <div
+                                                key={`${rowIndex}-${colIndex}`}
+                                                role="gridcell"
+                                                aria-label={isActiveCell ? undefined : `Row ${rowIndex + 1}, column ${colIndex + 1}: ${cellLabel}`}
+                                                className="relative"
+                                            >
+                                                <GamePiece
+                                                    isSelected={isWinningCell(rowIndex, colIndex)}
+                                                    state={cell}
+                                                    onClick={() => handlePieceClick(colIndex)}
+                                                    isHoverable={!gameOver}
+                                                    isDisabled={processingClick}
+                                                    isColumnHovered={colIndex === hoveredColumn}
+                                                    setColumnHovered={(column: number | null) => setHoveredColumn(column)}
+                                                    colIndex={colIndex}
+                                                    isActiveCell={isActiveCell}
+                                                    isFocusedColumn={colIndex === focusedColumn}
+                                                    discCount={getDiscCount(colIndex)}
+                                                    onArrowKey={(key) => handleColumnArrowKey(colIndex, key)}
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ))}
                         </div>
                     </div>
 

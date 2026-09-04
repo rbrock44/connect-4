@@ -12,6 +12,16 @@ const GamePiece = ({
     colIndex = 0,
     setColumnHovered = (_: number | null) => { },
     ariaLabel = undefined as string | undefined,
+    // Board cells only: whether this is the single cell per column that a piece
+    // would actually land in (the lowest empty row). Only that cell takes part
+    // in the grid's keyboard/tab navigation - the rest of the column's cells are
+    // announced as part of the row/gridcell structure but aren't separately
+    // focusable, so a screen reader user doesn't hear "drop in column 3" six
+    // times for the same column.
+    isActiveCell = true,
+    isFocusedColumn = true,
+    discCount = undefined as number | undefined,
+    onArrowKey = undefined as ((key: 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End') => void) | undefined,
 }) => {
     const getStateClasses = () => {
         switch (state) {
@@ -35,6 +45,14 @@ const GamePiece = ({
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Home' || event.key === 'End') {
+            if (onArrowKey) {
+                event.preventDefault();
+                onArrowKey(event.key);
+            }
+            return;
+        }
+
         if (isDisabled) return;
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -62,6 +80,10 @@ const GamePiece = ({
         ? 'w-6 h-6 sm:w-8 sm:h-8'
         : 'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12';
 
+    const defaultActiveLabel = discCount !== undefined
+        ? `drop in column ${colIndex + 1}, ${discCount} disc${discCount === 1 ? '' : 's'}`
+        : `Drop piece in column ${colIndex + 1}`;
+
     return (
         <div
             className={`
@@ -78,13 +100,14 @@ const GamePiece = ({
             onClick={!isDisabled ? onClick : undefined}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onKeyDown={handleKeyDown}
-            role="button"
-            tabIndex={isDisabled ? -1 : 0}
-            aria-label={ariaLabel ?? `Drop piece in column ${colIndex + 1}`}
-            aria-disabled={isDisabled}
+            onKeyDown={isActiveCell ? handleKeyDown : undefined}
+            role={isActiveCell ? 'button' : 'presentation'}
+            tabIndex={isActiveCell ? (isDisabled ? -1 : (isFocusedColumn ? 0 : -1)) : -1}
+            aria-label={isActiveCell ? (ariaLabel ?? defaultActiveLabel) : undefined}
+            aria-disabled={isActiveCell ? isDisabled : undefined}
+            data-col={colIndex}
+            data-active-cell={isActiveCell || undefined}
         >
-            
             <div className="absolute top-0.5 left-0.5 sm:top-1 sm:left-1 w-2 h-2 sm:w-3 sm:h-3 bg-white/30 rounded-full blur-sm" />
             <div className="absolute inset-0 rounded-full shadow-inner" />
         </div>
