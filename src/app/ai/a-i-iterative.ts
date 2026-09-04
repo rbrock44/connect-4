@@ -100,6 +100,19 @@ export class AIIterative extends Connect4AI {
 
         this.updateWeightsFromHistory(gameHistory);
 
+        // The deep search scores positions heuristically, so a win or a loss that
+        // is one move away can be out-scored by a comfortable looking line. Settle
+        // those two cases up front the way the other difficulties do.
+        const winningMove = this.findWinningMove(validMoves, board);
+        if (winningMove.row !== -1) {
+            return winningMove;
+        }
+
+        const blockingMove = this.findImmediateThreat(validMoves, board);
+        if (blockingMove.row !== -1) {
+            return blockingMove;
+        }
+
         let bestMove = validMoves[0];
         let bestScore = Number.NEGATIVE_INFINITY;
 
