@@ -8,7 +8,7 @@ React 19 + TypeScript + Vite single-page app to play Connect 4 against a human o
 - Dev server: `npm run dev` (or `npm start`, see README)
 - Build: `npm run build` (runs `tsc -b` then `vite build`, output to `dist/`)
 - Lint: `npm run lint` (ESLint flat config in `eslint.config.js`)
-- Test all: `npm run test:run` (vitest, single run) or `npm run test` (watch mode)
+- Test all: `npm test` (vitest, single run) or `npm run test:watch` (watch mode)
 - Test single file: `npx vitest run src/app/ai/a-i-hard.spec.ts`
 - Test single case: `npx vitest run -t "should always take immediate win"`
 - Deploy (CI only, on push to `master`): `npm run deploy` then `npm run gh-pages` (combined as `npm run prod`)

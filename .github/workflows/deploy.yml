@@ -23,7 +23,7 @@ jobs:
       run: npm ci
 
     - name: Run Tests
-      run: npm run test:run
+      run: npm test
 
     - name: Configure npm Authentication
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
